@@ -8,11 +8,13 @@ interface Props {
   disabled?: boolean;
   /** Extra classes, e.g. `btn--small`. */
   className?: string;
+  /** Which side the tooltip opens on (default: top). */
+  tooltipSide?: 'top' | 'right' | 'bottom' | 'left';
   children: ReactNode;
 }
 
 /** Square icon-only button with a Radix tooltip; `label` doubles as the accessible name. */
-export function IconButton({ label, onClick, active, disabled, className, children }: Props) {
+export function IconButton({ label, onClick, active, disabled, className, tooltipSide = 'top', children }: Props) {
   return (
     <Tooltip.Root>
       <Tooltip.Trigger asChild>
@@ -26,7 +28,7 @@ export function IconButton({ label, onClick, active, disabled, className, childr
         </button>
       </Tooltip.Trigger>
       <Tooltip.Portal>
-        <Tooltip.Content className="tooltip" side="top" sideOffset={6}>
+        <Tooltip.Content className="tooltip" side={tooltipSide} sideOffset={6}>
           {label}
           <Tooltip.Arrow className="tooltip__arrow" />
         </Tooltip.Content>
@@ -49,9 +51,13 @@ export const StopIcon = () => (
   </svg>
 );
 
-export const CrossIcon = () => (
-  <svg width={10} height={10} viewBox="0 0 10 10" aria-hidden>
-    <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+/** Trash can: clear (delete) a bank's clip. */
+export const TrashIcon = () => (
+  <svg width={12} height={12} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M1.5 3h9" />
+    <path d="M4.5 3V1.75h3V3" />
+    <path d="M2.75 3l.6 7.25h5.3l.6-7.25" />
+    <path d="M5 5v3.5M7 5v3.5" />
   </svg>
 );
 

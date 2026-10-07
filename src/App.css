@@ -723,6 +723,9 @@
   height: 20px;
   font-size: 10px;
 }
+.bank__actions .toggle {
+  font-family: var(--label-font);
+}
 
 /* ---------- knob (OP-1 style encoder) ---------- */
 

@@ -1,7 +1,7 @@
 import type { Envelope } from '../engine/envelope';
 import { BANK_COLORS, BANK_SCREEN, bankStyle, fmtTime, type BankUI } from '../types';
 import { AdsrViz } from './AdsrViz';
-import { CrossIcon, IconButton } from './IconButton';
+import { IconButton, TrashIcon } from './IconButton';
 import { Knob } from './Knob';
 
 const MIN_LEN = 0.05;
@@ -174,8 +174,14 @@ export function BankStrip({ index, bank, recording, onChange, onAudition, onClea
         >
           adsr
         </button>
-        <IconButton label={`Clear bank ${index + 1}`} onClick={onClear} disabled={empty} className="btn--small">
-          <CrossIcon />
+        <IconButton
+          label={`Clear bank ${index + 1}`}
+          onClick={onClear}
+          disabled={empty}
+          className="btn--small"
+          tooltipSide="left"
+        >
+          <TrashIcon />
         </IconButton>
       </div>
     </div>
