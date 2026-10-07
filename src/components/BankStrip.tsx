@@ -30,7 +30,7 @@ const fmtEnvTime = (v: number) => {
 };
 const fmtPct = (v: number) => `${Math.round(v * 100)}%`;
 
-const fmtDb = (g: number) => (g <= 0.0001 ? '-∞db' : `${(20 * Math.log10(g)).toFixed(1)}db`);
+const fmtDb = (g: number) => (g <= 0.0001 ? '-∞dB' : `${(20 * Math.log10(g)).toFixed(1)}dB`);
 
 export function BankStrip({ index, bank, recording, onChange, onAudition, onClear }: Props) {
   const color = BANK_COLORS[index];

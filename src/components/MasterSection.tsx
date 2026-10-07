@@ -16,7 +16,7 @@ const W = 168;
 const H = 18;
 
 const toDb = (lin: number) => (lin > 0 ? 20 * Math.log10(lin) : -Infinity);
-const fmtDb = (g: number) => (g <= 0.0001 ? '-∞db' : `${(20 * Math.log10(g)).toFixed(1)}db`);
+const fmtDb = (g: number) => (g <= 0.0001 ? '-∞dB' : `${(20 * Math.log10(g)).toFixed(1)}dB`);
 
 /** dB → number of lit segments. */
 const segs = (db: number) => Math.max(0, Math.min(SEGMENTS, Math.round(((db - FLOOR_DB) / -FLOOR_DB) * SEGMENTS)));
