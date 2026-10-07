@@ -28,6 +28,8 @@
   --rec: #ff3b1f;
   --screen: #141414;
   --mono: 'VG5000', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  /* Space Grotesk (Florian Karsten, SIL OFL): knob labels and tab titles */
+  --label-font: 'Space Grotesk', system-ui, sans-serif;
   font-family: var(--mono);
   /* single-weight pixel font: never fake a bold */
   font-synthesis: none;

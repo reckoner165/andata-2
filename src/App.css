@@ -245,6 +245,11 @@
   gap: 14px;
   flex-wrap: wrap;
 }
+/* "camera", "mic", "bank" headings */
+.sourcebar .field__label {
+  font-family: var(--label-font);
+  font-size: 11px;
+}
 .sourcebar__preview {
   width: 88px;
   height: 50px;
@@ -270,6 +275,8 @@
   border-radius: 3px;
   cursor: pointer;
   text-align: left;
+  font-family: var(--label-font);
+  font-size: 12px;
 }
 .select > span:first-child {
   overflow: hidden;
@@ -278,6 +285,10 @@
 }
 .select:hover:not(:disabled) {
   background: var(--tint);
+}
+.select:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
 }
 .select:disabled {
   opacity: 0.5;
@@ -295,8 +306,8 @@
   border: 1px solid var(--rule);
   border-radius: 4px;
   padding: 3px;
-  font-family: var(--mono);
-  font-size: 13px;
+  font-family: var(--label-font);
+  font-size: 12px;
 }
 .select__item {
   padding: 6px 10px;
@@ -747,8 +758,9 @@
   opacity: 0.3;
 }
 .knob__label {
-  font-size: 11px;
   color: var(--muted);
+  font-family: var(--label-font);
+  font-size: 10px;
 }
 .knob__readout {
   font-size: 11px;
@@ -1020,8 +1032,9 @@
   border-bottom: 2px solid transparent;
   background: none;
   color: var(--muted);
-  font-size: 11px;
   cursor: pointer;
+  font-family: var(--label-font);
+  font-size: 11px;
 }
 .banks__tab:hover {
   color: var(--ink);
@@ -1077,8 +1090,9 @@
   border-bottom: 3px solid transparent;
   background: none;
   color: var(--muted);
-  font-size: 11px;
   cursor: pointer;
+  font-family: var(--label-font);
+  font-size: 11px;
 }
 .fx__tab:hover {
   color: var(--ink);
