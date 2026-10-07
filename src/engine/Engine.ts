@@ -1,6 +1,7 @@
 import { Bank } from './Bank';
 import { downloadBlob, startCapture, type Capture } from './capture';
 import { Clip } from './Clip';
+import { duotoneFilterId } from './fx';
 import { drawCover, tileRects } from './layout';
 import { Sequencer, STEPS } from './Sequencer';
 
@@ -220,7 +221,10 @@ export class Engine {
     g.fillRect(0, 0, W, H);
     active.forEach((b, i) => {
       const img = b.frame(now);
-      if (img) drawCover(g, img, rects[i]);
+      if (!img) return;
+      if (b.fx.amount > 0) g.filter = `url(#${duotoneFilterId(b.index)})`;
+      drawCover(g, img, rects[i]);
+      g.filter = 'none';
     });
 
     const step = this.seq?.currentStep(now) ?? -1;

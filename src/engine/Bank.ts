@@ -1,5 +1,6 @@
 import type { Clip } from './Clip';
 import { DEFAULT_ENVELOPE, type Envelope } from './envelope';
+import { defaultFx, type DuotoneFx } from './fx';
 import { Voice } from './Voice';
 
 const MAX_VOICES = 4;
@@ -14,6 +15,8 @@ export class Bank {
   choke = true;
   /** Applied to voices triggered from now on. */
   envelope: Envelope = { ...DEFAULT_ENVELOPE };
+  /** Video effect for this bank's tile; colours live in the matching SVG filter. */
+  fx: DuotoneFx = defaultFx('#ffffff');
   readonly gain: GainNode;
   readonly panner: StereoPannerNode;
 

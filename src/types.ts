@@ -1,4 +1,5 @@
 import { DEFAULT_ENVELOPE, type Envelope } from './engine/envelope';
+import { defaultFx, type DuotoneFx } from './engine/fx';
 
 export const BANK_COLORS = ['#ff5a36', '#ffc531', '#8ac17a', '#9483d6'];
 
@@ -16,9 +17,10 @@ export interface BankUI {
   envelope: Envelope;
   /** Strip shows the envelope editor instead of trim/gain/pan. */
   showAdsr: boolean;
+  fx: DuotoneFx;
 }
 
-export const emptyBank = (): BankUI => ({
+export const emptyBank = (index: number): BankUI => ({
   hasClip: false,
   loading: false,
   duration: 0,
@@ -30,6 +32,7 @@ export const emptyBank = (): BankUI => ({
   pan: 0,
   envelope: { ...DEFAULT_ENVELOPE },
   showAdsr: false,
+  fx: defaultFx(BANK_COLORS[index]),
 });
 
 export const fmtTime = (s: number) => `${s.toFixed(2)}s`;

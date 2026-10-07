@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Tooltip } from 'radix-ui';
+import { BankPanel } from './components/BankPanel';
 import { BankStrip } from './components/BankStrip';
+import { FxFilters } from './components/FxFilters';
 import { MasterSection } from './components/MasterSection';
 import { PowerSwitch } from './components/PowerSwitch';
 import { SequencerPanel } from './components/SequencerPanel';
 import { SourceBar } from './components/SourceBar';
 import { Stage } from './components/Stage';
+import { VideoFxPanel } from './components/VideoFxPanel';
 import { BANK_COUNT, emptyGrid, Engine, type Orientation } from './engine/Engine';
 import { emptyBank, type BankUI } from './types';
 import './App.css';
@@ -31,7 +34,7 @@ export default function App() {
   const [recBank, setRecBank] = useState<number | null>(null);
   const [recStart, setRecStart] = useState(0);
   const [recBusy, setRecBusy] = useState(false);
-  const [banks, setBanks] = useState<BankUI[]>(() => Array.from({ length: BANK_COUNT }, emptyBank));
+  const [banks, setBanks] = useState<BankUI[]>(() => Array.from({ length: BANK_COUNT }, (_, i) => emptyBank(i)));
 
   const [grid, setGrid] = useState(emptyGrid);
   const [step, setStep] = useState(-1);
@@ -141,6 +144,12 @@ export default function App() {
     if (patch.gain !== undefined) b.setGain(patch.gain);
     if (patch.pan !== undefined) b.setPan(patch.pan);
     if (patch.envelope !== undefined) b.envelope = patch.envelope;
+    if (patch.fx !== undefined) b.fx = patch.fx;
+  };
+
+  const copyFxToAll = (from: number) => {
+    const fx = banks[from].fx;
+    banks.forEach((_, i) => changeBank(i, { fx: { ...fx } }));
   };
 
   const clearBank = (i: number) => {
@@ -269,6 +278,7 @@ export default function App() {
   return (
     <Tooltip.Provider delayDuration={300}>
       <div className={`app app--${orientation}`}>
+        <FxFilters fx={banks.map((b) => b.fx)} />
         <header className="topbar">
           <PowerSwitch on={power} busy={powerBusy} onToggle={togglePower} />
           <div className="brand">
@@ -315,8 +325,8 @@ export default function App() {
               onOrientationChange={setOrientation}
               orientationLocked={bouncing || bounceBusy}
             />
-            <div className="banks">
-              {banks.map((b, i) => (
+            <BankPanel
+              control={banks.map((b, i) => (
                 <BankStrip
                   key={i}
                   index={i}
@@ -327,7 +337,15 @@ export default function App() {
                   onClear={() => clearBank(i)}
                 />
               ))}
-            </div>
+              videoFx={
+                <VideoFxPanel
+                  banks={banks}
+                  orientation={orientation}
+                  onChange={(i, fx) => changeBank(i, { fx })}
+                  onCopyToAll={copyFxToAll}
+                />
+              }
+            />
           </div>
           <hr className="divider" />
           <SequencerPanel

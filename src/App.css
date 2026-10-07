@@ -560,7 +560,7 @@
 .bank {
   flex: 1;
   position: relative;
-  padding: 5px 10px 5px 16px;
+  padding: 3px 10px 3px 16px;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
@@ -997,3 +997,254 @@
   cursor: default;
 }
 
+/* ---------- bank panel tabs ---------- */
+
+.banks__tabs {
+  display: flex;
+  flex: none;
+  gap: 2px;
+  height: 26px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--line);
+}
+.banks__tab {
+  padding: 0 10px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--muted);
+  font-size: 11px;
+  cursor: pointer;
+}
+.banks__tab:hover {
+  color: var(--ink);
+}
+.banks__tab[data-state='active'] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+.banks__content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.banks__content:focus-visible {
+  outline: none;
+}
+/* Radix keeps inactive tab panels in the DOM with [hidden]; our display:flex would override it */
+.banks__content[hidden],
+.fx__body[hidden] {
+  display: none;
+}
+
+/* ---------- video fx ---------- */
+
+/* filter definitions must stay rendered (display:none would disable them) */
+.fx-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.fx {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.fx__tabs {
+  display: flex;
+  height: 28px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--line);
+}
+.fx__tab {
+  position: relative;
+  /* the four banks share the panel width equally */
+  flex: 1;
+  padding: 0;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--muted);
+  font-size: 11px;
+  cursor: pointer;
+}
+.fx__tab:hover {
+  color: var(--ink);
+}
+/* only the active tab carries its bank colour. (aria-selected, not data-state: the
+   context-menu trigger on the same element overwrites data-state with open/closed) */
+.fx__tab[aria-selected='true'] {
+  color: var(--ink);
+  border-bottom-color: var(--bank);
+}
+.fx__dot {
+  /* sits just after the label, so it stays with it on a wide tab */
+  display: inline-block;
+  margin: 0 0 6px 3px;
+  vertical-align: middle;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.fx__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 10px;
+  padding: 10px 12px;
+  overflow: auto;
+}
+.fx__body:focus-visible {
+  outline: none;
+}
+.fx__title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+/* the two pickers, with the colour strip under them */
+.fx__colorgroup {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.fx__preview {
+  display: grid;
+  place-items: center;
+  flex: none;
+  overflow: hidden;
+  border: 2px solid var(--screen);
+  border-radius: 4px;
+  background: var(--screen);
+  color: #fffc;
+  font-size: 11px;
+  transition: width 0.45s cubic-bezier(0.3, 0.7, 0.2, 1), height 0.45s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+.fx__preview--landscape {
+  width: 160px;
+  height: 90px;
+}
+.fx__preview--portrait {
+  width: 63px;
+  height: 112px;
+}
+.fx__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.fx__ramp {
+  height: 10px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+}
+.fx__colors {
+  display: flex;
+  gap: 8px;
+}
+/* preview on the left, all controls beside it */
+.fx__row {
+  display: flex;
+  /* the effect list grows downward from the top of the preview */
+  align-items: flex-start;
+  gap: 12px;
+}
+.fx__list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.fxsec + .fxsec {
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.fxsec__name {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: normal;
+}
+.fxsec__controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.fxcolor {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 3px;
+  width: 64px;
+  cursor: pointer;
+}
+.fxcolor__swatch {
+  position: relative;
+  height: 24px;
+  border: 1px solid var(--rule);
+  border-bottom-color: var(--key-edge);
+  border-radius: 3px;
+}
+.fxcolor__swatch input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.fxcolor__hex {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.fx__hint {
+  margin: auto 0 0;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* right-click menu (radix context menu) */
+.menu {
+  z-index: 30;
+  min-width: 170px;
+  padding: 3px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--surface);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.menu__label {
+  padding: 4px 8px 2px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.menu__item {
+  padding: 6px 8px;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  user-select: none;
+}
+.menu__item[data-highlighted] {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.banks__tab:focus-visible,
+.fx__tab:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -2px;
+}
