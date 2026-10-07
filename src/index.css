@@ -1,0 +1,48 @@
+/* VG5000 by Justin Bihan / Velvetyne Type Foundry, SIL OFL 1.1 (see assets/fonts/vg5000/LICENSE.txt) */
+@font-face {
+  font-family: 'VG5000';
+  src:
+    url('./assets/fonts/vg5000/VG5000-Regular.woff2') format('woff2'),
+    url('./assets/fonts/vg5000/VG5000-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #e2e2dd;
+  --panel: #f3f3ef;
+  --surface: #fbfbf8;
+  --line: #cdcdc6;
+  --line-strong: #a9a9a2;
+  --ink: #141414;
+  --muted: #85857e;
+  --accent: #ff5a1f;
+  --rec: #ff3b1f;
+  --screen: #141414;
+  --mono: 'VG5000', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-family: var(--mono);
+  /* single-weight pixel font: never fake a bold */
+  font-synthesis: none;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--bg);
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+button,
+select,
+input {
+  font: inherit;
+  color: inherit;
+}
