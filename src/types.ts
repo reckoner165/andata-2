@@ -1,6 +1,6 @@
 import { DEFAULT_ENVELOPE, type Envelope } from './engine/envelope';
 
-export const BANK_COLORS = ['#ff5a36', '#ffc531', '#3ddc97', '#4aa8ff'];
+export const BANK_COLORS = ['#ff5a36', '#ffc531', '#8ac17a', '#9483d6'];
 
 export interface BankUI {
   hasClip: boolean;
