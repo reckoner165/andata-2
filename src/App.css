@@ -214,6 +214,21 @@
   }
 }
 
+.logo {
+  flex: none;
+  align-self: center;
+  width: 32px;
+  height: 32px;
+  margin-left: 6px;
+  /* bars start 2px inside the icon; +2px puts them 4px in from the panel edge,
+     mirroring the power switch's 4px inset on the left */
+  margin-right: 2px;
+  transition: opacity 0.25s;
+}
+/* dims with the rest of the panels while power is off */
+.logo--off {
+  opacity: 0.4;
+}
 .brand {
   display: flex;
   flex-direction: column;

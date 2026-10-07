@@ -302,6 +302,8 @@ export default function App() {
               onRecToggle={toggleRecord}
             />
           </fieldset>
+          {/* same file as the favicon, so the two always match */}
+          <img className={`logo${power ? '' : ' logo--off'}`} src="/favicon.svg" alt="andata-2" />
         </header>
 
         {error && (
