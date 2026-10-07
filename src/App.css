@@ -225,8 +225,12 @@
 }
 
 .rack--top {
+  /* sits on the page with the power switch and title: no box of its own */
   flex: 1;
-  padding: 8px 12px;
+  padding: 4px 0 4px 12px;
+  border: none;
+  border-radius: 0;
+  background: none;
 }
 
 .sourcebar {
@@ -386,7 +390,7 @@
   flex-direction: column;
   gap: 12px;
   /* Vertical space taken by everything except the stage; the stage shrinks so the sequencer stays in view. */
-  --chrome-h: 376px;
+  --chrome-h: 366px;
 }
 .divider {
   width: 100%;
