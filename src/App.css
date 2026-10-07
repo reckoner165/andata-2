@@ -863,18 +863,22 @@
   height: 32px;
   padding: 0 12px 0 10px;
   border-radius: 3px;
-  background: var(--screen);
-  color: #fff;
+  border: 1px solid var(--rule);
+  background: transparent;
+  color: var(--ink);
 }
 .lcd__num {
-  width: 38px;
+  /* exactly three VG5000 digits (0.6em each), right-aligned so the number hugs "bpm" */
+  width: 1.8em;
+  padding: 0;
+  text-align: right;
   background: transparent;
   border: none;
   outline: none;
   font-size: 17px;
   line-height: 32px;
   font-variant-numeric: tabular-nums;
-  color: #fff;
+  color: var(--ink);
 }
 .lcd__readout {
   display: flex;
@@ -994,21 +998,9 @@
   outline-color: var(--bank-ink);
 }
 
-/* BPM slider lives inside the black display */
+/* BPM slider lives inside the outlined BPM box */
 .slider--lcd {
   width: 72px;
-}
-.slider--lcd::-webkit-slider-runnable-track {
-  background: #ffffff55;
-}
-.slider--lcd::-moz-range-track {
-  background: #ffffff55;
-}
-.slider--lcd::-webkit-slider-thumb {
-  border-color: var(--screen);
-}
-.slider--lcd::-moz-range-thumb {
-  border-color: var(--screen);
 }
 
 /* ---------- ADSR mode ---------- */
