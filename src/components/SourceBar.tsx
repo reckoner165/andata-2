@@ -81,39 +81,42 @@ export function SourceBar(p: Props) {
 
       <div className="field">
         <span className="field__label">bank</span>
-        <ToggleGroup.Root
-          type="single"
-          className="bankgroup"
-          value={String(p.selectedBank)}
-          onValueChange={(v) => v && p.onSelectBank(Number(v))}
-          disabled={p.recording}
-          aria-label="Record into bank"
-        >
-          {BANK_COLORS.map((color, i) => (
-            <ToggleGroup.Item
-              key={i}
-              value={String(i)}
-              className="bankbtn"
-              style={{ '--bank': color } as React.CSSProperties}
-            >
-              {i + 1}
-            </ToggleGroup.Item>
-          ))}
-        </ToggleGroup.Root>
-      </div>
+        <div className="bankrow">
+          <ToggleGroup.Root
+            type="single"
+            className="bankgroup"
+            value={String(p.selectedBank)}
+            onValueChange={(v) => v && p.onSelectBank(Number(v))}
+            disabled={p.recording}
+            aria-label="Record into bank (keys 1–4)"
+          >
+            {BANK_COLORS.map((color, i) => (
+              <ToggleGroup.Item
+                key={i}
+                value={String(i)}
+                className="bankbtn"
+                style={{ '--bank': color } as React.CSSProperties}
+                title={`Bank ${i + 1} (key ${i + 1})`}
+              >
+                {i + 1}
+              </ToggleGroup.Item>
+            ))}
+          </ToggleGroup.Root>
 
-      <Toggle.Root
-        className="recbtn"
-        pressed={p.recording}
-        onPressedChange={p.onRecToggle}
-        disabled={p.recBusy || !p.stream}
-        aria-label="Record clip"
-      >
-        <span className="recbtn__dot" />
-        <span className="recbtn__text">
-          {p.recBusy ? 'saving' : p.recording ? `stop ${p.recElapsed.toFixed(1)}s` : `rec → ${p.selectedBank + 1}`}
-        </span>
-      </Toggle.Root>
+          <Toggle.Root
+            className="recbtn"
+            pressed={p.recording}
+            onPressedChange={p.onRecToggle}
+            disabled={p.recBusy || !p.stream}
+            aria-label="Record clip"
+          >
+            <span className="recbtn__dot" />
+            <span className="recbtn__text">
+              {p.recBusy ? 'saving' : p.recording ? `stop ${p.recElapsed.toFixed(1)}s` : `rec → ${p.selectedBank + 1}`}
+            </span>
+          </Toggle.Root>
+        </div>
+      </div>
     </div>
   );
 }

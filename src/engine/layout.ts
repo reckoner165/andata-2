@@ -2,7 +2,10 @@ export type Rect = [x: number, y: number, w: number, h: number];
 
 const GAP = 4;
 
-/** 1 = full, 2 = side-by-side, 3 = two on top + one wide bottom, 4 = 2×2. */
+/**
+ * 1 = full, 2 = side-by-side (stacked on a portrait stage, where side-by-side
+ * would give thin slivers), 3 = two on top + one wide bottom, 4 = 2×2.
+ */
 export function tileRects(count: number, W: number, H: number): Rect[] {
   const g = GAP / 2;
   const hw = W / 2;
@@ -13,10 +16,15 @@ export function tileRects(count: number, W: number, H: number): Rect[] {
     case 1:
       return [[0, 0, W, H]];
     case 2:
-      return [
-        [0, 0, hw - g, H],
-        [hw + g, 0, hw - g, H],
-      ];
+      return H > W
+        ? [
+            [0, 0, W, hh - g],
+            [0, hh + g, W, hh - g],
+          ]
+        : [
+            [0, 0, hw - g, H],
+            [hw + g, 0, hw - g, H],
+          ];
     case 3:
       return [
         [0, 0, hw - g, hh - g],

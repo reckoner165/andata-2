@@ -20,6 +20,8 @@
   --line-strong: #a3a39b;
   /* controls sit slightly proud: darker bottom edge */
   --key-edge: #a8a8a0;
+  /* powder-coat grain: fine grey noise, soft-light blended over the base colour */
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncR type='linear' slope='3' intercept='-1'/><feFuncG type='linear' slope='3' intercept='-1'/><feFuncB type='linear' slope='3' intercept='-1'/></feComponentTransfer></filter><rect width='160' height='160' filter='url(%23g)'/></svg>");
   --ink: #141414;
   --muted: #85857e;
   --accent: #ff5a1f;
@@ -42,7 +44,9 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image: var(--grain);
+  background-blend-mode: soft-light;
 }
 
 button,

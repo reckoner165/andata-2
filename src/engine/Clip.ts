@@ -87,7 +87,8 @@ async function decodeAudio(
 
 async function makeThumbnail(track: InputVideoTrack, t0: number): Promise<string | null> {
   try {
-    const sink = new CanvasSink(track, { width: 160, height: 90, fit: 'cover', poolSize: 0 });
+    // Large enough that the centre crop shown in portrait mode stays sharp.
+    const sink = new CanvasSink(track, { width: 320, height: 180, fit: 'cover', poolSize: 0 });
     const wrapped = await sink.getCanvas(t0);
     if (!wrapped) return null;
     const { canvas } = wrapped;

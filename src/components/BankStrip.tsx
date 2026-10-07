@@ -1,4 +1,5 @@
 import { BANK_COLORS, fmtTime, type BankUI } from '../types';
+import { CrossIcon, IconButton } from './IconButton';
 import { Knob } from './Knob';
 
 const MIN_LEN = 0.05;
@@ -104,9 +105,9 @@ export function BankStrip({ index, bank, recording, onChange, onAudition, onClea
         >
           choke
         </button>
-        <button className="btn btn--small" onClick={onClear} disabled={empty} title="Clear bank">
-          ✕
-        </button>
+        <IconButton label={`Clear bank ${index + 1}`} onClick={onClear} disabled={empty} className="btn--small">
+          <CrossIcon />
+        </IconButton>
       </div>
     </div>
   );

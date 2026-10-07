@@ -5,8 +5,12 @@ import { drawCover, tileRects } from './layout';
 import { Sequencer, STEPS } from './Sequencer';
 
 export const BANK_COUNT = 4;
-export const STAGE_W = 1280;
-export const STAGE_H = 720;
+export type Orientation = 'landscape' | 'portrait';
+/** Stage canvas size per orientation; the canvas size is also the bounce resolution. */
+export const STAGE_SIZE: Record<Orientation, [w: number, h: number]> = {
+  landscape: [1280, 720],
+  portrait: [720, 1280],
+};
 
 export const emptyGrid = () => Array.from({ length: BANK_COUNT }, () => Array<boolean>(STEPS).fill(false));
 
@@ -190,25 +194,30 @@ export class Engine {
   // ---- compositor ----
 
   private clearStage() {
-    const g = this.canvas?.getContext('2d');
-    if (!g) return;
+    const c = this.canvas;
+    const g = c?.getContext('2d');
+    if (!c || !g) return;
     g.fillStyle = this.bg;
-    g.fillRect(0, 0, STAGE_W, STAGE_H);
+    g.fillRect(0, 0, c.width, c.height);
   }
 
   private loop = () => {
     this.raf = requestAnimationFrame(this.loop);
     const ctx = this.ctx;
-    const g = this.canvas?.getContext('2d');
-    if (!ctx || !g) return;
+    const c = this.canvas;
+    const g = c?.getContext('2d');
+    if (!ctx || !c || !g) return;
+    // Read the size every frame: the orientation toggle resizes the canvas.
+    const W = c.width;
+    const H = c.height;
     const now = ctx.currentTime;
 
     for (const b of this.banks) b.cleanup(now);
     const active = this.banks.filter((b) => b.isActive(now));
-    const rects = tileRects(active.length, STAGE_W, STAGE_H);
+    const rects = tileRects(active.length, W, H);
 
     g.fillStyle = this.bg;
-    g.fillRect(0, 0, STAGE_W, STAGE_H);
+    g.fillRect(0, 0, W, H);
     active.forEach((b, i) => {
       const img = b.frame(now);
       if (img) drawCover(g, img, rects[i]);

@@ -6,7 +6,7 @@ import { PowerSwitch } from './components/PowerSwitch';
 import { SequencerPanel } from './components/SequencerPanel';
 import { SourceBar } from './components/SourceBar';
 import { Stage } from './components/Stage';
-import { BANK_COUNT, emptyGrid, Engine } from './engine/Engine';
+import { BANK_COUNT, emptyGrid, Engine, type Orientation } from './engine/Engine';
 import { emptyBank, type BankUI } from './types';
 import './App.css';
 
@@ -38,6 +38,7 @@ export default function App() {
   const [playing, setPlaying] = useState(false);
   const [bpm, setBpm] = useState(120);
   const [bg, setBg] = useState('#000000');
+  const [orientation, setOrientation] = useState<Orientation>('landscape');
   const [masterVolume, setMasterVolume] = useState(1);
 
   const [bouncing, setBouncing] = useState(false);
@@ -217,22 +218,56 @@ export default function App() {
     }
   };
 
-  // Space toggles play when not typing in a field.
+  // Number keys 1–4 pick the record bank (same as the top-bar bank buttons).
   useEffect(() => {
-    if (!power) return;
+    if (!power || recBank !== null) return;
     const onKey = (e: KeyboardEvent) => {
-      const t = e.target as HTMLElement;
-      if (e.code !== 'Space' || t.closest('input, select, textarea, button, [role="slider"]')) return;
+      if (e.metaKey || e.ctrlKey || e.altKey || e.repeat) return;
+      // Physical key (number row or numpad), so it works on any keyboard layout.
+      const m = /^(?:Digit|Numpad)(\d)$/.exec(e.code);
+      const n = m ? Number(m[1]) : NaN;
+      if (!(n >= 1 && n <= BANK_COUNT)) return;
+      // Let digits through to text/number fields (e.g. typing a BPM) and open lists.
+      if ((e.target as HTMLElement).closest?.('input[type="number"], input[type="text"], textarea, [role="listbox"]')) return;
       e.preventDefault();
-      togglePlay();
+      setSelectedBank(n - 1);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
+  }, [power, recBank]);
+
+  // Space is always play/pause, whatever has focus (a just-clicked pad, knob, button…).
+  // Captured at the window so the focused control never sees it — a button would
+  // otherwise "click" on space. The one exception is an open dropdown list, where
+  // space picks an item.
+  useEffect(() => {
+    if (!power) return;
+    const isSpace = (e: KeyboardEvent) =>
+      e.code === 'Space' &&
+      // the BPM field only takes digits, so space stays play/pause there too
+      !(e.target as HTMLElement).closest?.('[role="listbox"], textarea, input[type="text"]:not(.lcd__num)');
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!isSpace(e)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (!e.repeat) togglePlay();
+    };
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (!isSpace(e)) return;
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    window.addEventListener('keydown', onKeyDown, { capture: true });
+    window.addEventListener('keyup', onKeyUp, { capture: true });
+    return () => {
+      window.removeEventListener('keydown', onKeyDown, { capture: true });
+      window.removeEventListener('keyup', onKeyUp, { capture: true });
+    };
   });
 
   return (
     <Tooltip.Provider delayDuration={300}>
-      <div className="app">
+      <div className={`app app--${orientation}`}>
         <header className="topbar">
           <PowerSwitch on={power} busy={powerBusy} onToggle={togglePower} />
           <div className="brand">
@@ -267,24 +302,33 @@ export default function App() {
           </div>
         )}
 
-        <fieldset className="rack rack--main" disabled={!power}>
-          <Stage canvasRef={canvasRef} powered={power} bg={bg} onBgChange={setBg} />
-          <div className="banks">
-            {banks.map((b, i) => (
-              <BankStrip
-                key={i}
-                index={i}
-                bank={b}
-                recording={recBank === i}
-                onChange={(patch) => changeBank(i, patch)}
-                onAudition={() => engine.audition(i)}
-                onClear={() => clearBank(i)}
-              />
-            ))}
+        {/* video row and sequencer share one panel, split by a divider */}
+        <fieldset className="rack rack--body" disabled={!power}>
+          <div className="mainrow">
+            <Stage
+              canvasRef={canvasRef}
+              powered={power}
+              bg={bg}
+              onBgChange={setBg}
+              orientation={orientation}
+              onOrientationChange={setOrientation}
+              orientationLocked={bouncing || bounceBusy}
+            />
+            <div className="banks">
+              {banks.map((b, i) => (
+                <BankStrip
+                  key={i}
+                  index={i}
+                  bank={b}
+                  recording={recBank === i}
+                  onChange={(patch) => changeBank(i, patch)}
+                  onAudition={() => engine.audition(i)}
+                  onClear={() => clearBank(i)}
+                />
+              ))}
+            </div>
           </div>
-        </fieldset>
-
-        <fieldset className="rack" disabled={!power}>
+          <hr className="divider" />
           <SequencerPanel
             grid={grid}
             step={step}

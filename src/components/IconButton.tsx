@@ -5,15 +5,23 @@ interface Props {
   label: string;
   onClick: () => void;
   active?: boolean;
+  disabled?: boolean;
+  /** Extra classes, e.g. `btn--small`. */
+  className?: string;
   children: ReactNode;
 }
 
 /** Square icon-only button with a Radix tooltip; `label` doubles as the accessible name. */
-export function IconButton({ label, onClick, active, children }: Props) {
+export function IconButton({ label, onClick, active, disabled, className, children }: Props) {
   return (
     <Tooltip.Root>
       <Tooltip.Trigger asChild>
-        <button className={`btn btn--icon${active ? ' btn--active' : ''}`} onClick={onClick} aria-label={label}>
+        <button
+          className={`btn btn--icon${active ? ' btn--active' : ''}${className ? ` ${className}` : ''}`}
+          onClick={onClick}
+          disabled={disabled}
+          aria-label={label}
+        >
           {children}
         </button>
       </Tooltip.Trigger>
@@ -38,6 +46,24 @@ export const PlayIcon = () => (
 export const StopIcon = () => (
   <svg {...svg}>
     <rect x="3" y="3" width="10" height="10" rx="1" fill="currentColor" />
+  </svg>
+);
+
+export const CrossIcon = () => (
+  <svg width={10} height={10} viewBox="0 0 10 10" aria-hidden>
+    <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
+export const LandscapeIcon = () => (
+  <svg width={14} height={14} viewBox="0 0 14 14" aria-hidden>
+    <rect x="1" y="3.5" width="12" height="7" rx="1" fill="none" stroke="currentColor" strokeWidth="1.4" />
+  </svg>
+);
+
+export const PortraitIcon = () => (
+  <svg width={14} height={14} viewBox="0 0 14 14" aria-hidden>
+    <rect x="3.5" y="1" width="7" height="12" rx="1" fill="none" stroke="currentColor" strokeWidth="1.4" />
   </svg>
 );
 

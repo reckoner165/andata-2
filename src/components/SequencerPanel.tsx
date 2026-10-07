@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { BANK_COLORS } from '../types';
 import { ClearIcon, IconButton, PlayIcon, RandomIcon, StopIcon } from './IconButton';
 
@@ -28,8 +28,18 @@ export const BPM_MIN = 40;
 export const BPM_MAX = 240;
 
 export function SequencerPanel(p: Props) {
+  const clampBpm = (v: number) => Math.min(BPM_MAX, Math.max(BPM_MIN, Math.round(v)));
   const setBpm = (v: number) => {
-    if (!Number.isNaN(v)) p.onBpm(Math.min(BPM_MAX, Math.max(BPM_MIN, Math.round(v))));
+    if (!Number.isNaN(v)) p.onBpm(clampBpm(v));
+  };
+
+  // The BPM field edits a draft; it is clamped and applied on Enter or blur
+  // (clamping per keystroke would turn "1" into 40 before you finish typing).
+  const [bpmDraft, setBpmDraft] = useState<string | null>(null);
+  const cancelDraft = useRef(false);
+  const commitBpm = () => {
+    if (bpmDraft !== null && bpmDraft !== '') setBpm(parseInt(bpmDraft, 10));
+    setBpmDraft(null);
   };
 
   return (
@@ -38,23 +48,54 @@ export function SequencerPanel(p: Props) {
         <IconButton label={p.playing ? 'Stop (space)' : 'Play (space)'} onClick={p.onPlayToggle} active={p.playing}>
           {p.playing ? <StopIcon /> : <PlayIcon />}
         </IconButton>
+        <IconButton
+          label={p.bouncing ? `Stop and download (${p.bounceElapsed.toFixed(1)}s)` : 'Record output and download'}
+          onClick={p.onBounceToggle}
+          disabled={p.bounceBusy}
+          className={`btn--rec${p.bouncing ? ' btn--rec-on' : ''}`}
+        >
+          <span className="rec-dot" />
+        </IconButton>
 
-        <div className="bpm">
-          <div className="lcd">
+        <div className="lcd">
+          <span className="lcd__readout">
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
               className="lcd__num"
-              min={BPM_MIN}
-              max={BPM_MAX}
-              value={p.bpm}
-              onChange={(e) => setBpm(e.target.valueAsNumber)}
-              aria-label="BPM"
+              value={bpmDraft ?? String(p.bpm)}
+              onFocus={(e) => {
+                setBpmDraft(String(p.bpm));
+                e.currentTarget.select();
+              }}
+              onChange={(e) => setBpmDraft(e.target.value.replace(/\D/g, '').slice(0, 3))}
+              onBlur={() => {
+                if (cancelDraft.current) {
+                  cancelDraft.current = false;
+                  setBpmDraft(null);
+                } else commitBpm();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.currentTarget.blur(); // blur commits
+                } else if (e.key === 'Escape') {
+                  cancelDraft.current = true;
+                  e.currentTarget.blur();
+                } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  const base = parseInt(bpmDraft ?? '', 10) || p.bpm;
+                  const next = clampBpm(base + (e.key === 'ArrowUp' ? 1 : -1) * (e.shiftKey ? 10 : 1));
+                  p.onBpm(next);
+                  setBpmDraft(String(next));
+                }
+              }}
+              aria-label={`BPM (${BPM_MIN}–${BPM_MAX}, Enter to apply)`}
             />
             <span className="lcd__unit">bpm</span>
-          </div>
+          </span>
           <input
             type="range"
-            className="slider"
+            className="slider slider--lcd"
             min={BPM_MIN}
             max={BPM_MAX}
             value={p.bpm}
@@ -71,16 +112,6 @@ export function SequencerPanel(p: Props) {
         </IconButton>
 
         {p.master}
-
-        <button
-          className={`btn btn--rec${p.bouncing ? ' btn--rec-on' : ''}`}
-          onClick={p.onBounceToggle}
-          disabled={p.bounceBusy}
-          title="Record the composed output; stopping downloads an MP4"
-        >
-          <span className="rec-dot" />
-          {p.bounceBusy ? 'bouncing' : p.bouncing ? `save ${p.bounceElapsed.toFixed(1)}s` : 'rec output'}
-        </button>
       </div>
 
       <div className="seq__grid">

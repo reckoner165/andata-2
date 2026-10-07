@@ -13,7 +13,9 @@
 .rack {
   border: 1px solid var(--rule);
   border-radius: 10px;
-  background: var(--panel);
+  background-color: var(--panel);
+  background-image: var(--grain);
+  background-blend-mode: soft-light;
   margin: 0;
   padding: 12px;
   min-width: 0;
@@ -44,7 +46,7 @@
   background: var(--surface);
   border: 1px solid var(--rule);
   border-bottom-color: var(--key-edge);
-  border-radius: 6px;
+  border-radius: 3px;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -84,7 +86,7 @@
 .tooltip {
   z-index: 20;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 2px;
   background: var(--ink);
   color: var(--bg);
   font-family: var(--mono);
@@ -120,7 +122,7 @@
   background: var(--surface);
   border: 1px solid var(--rule);
   border-bottom-color: var(--key-edge);
-  border-radius: 12px;
+  border-radius: 4px;
   font-size: 11px;
   cursor: pointer;
   color: var(--muted);
@@ -160,7 +162,7 @@
   width: 72px;
   height: 36px;
   border: 1px solid var(--key-edge);
-  border-radius: 18px;
+  border-radius: 5px;
   background: #dcdbd3;
   transition: background 0.15s, border-color 0.15s;
 }
@@ -170,7 +172,7 @@
   left: 2px;
   width: 30px;
   height: 30px;
-  border-radius: 50%;
+  border-radius: 3px;
   background: #fff;
   border: 1px solid var(--key-edge);
   transition: transform 0.18s ease-out;
@@ -237,6 +239,7 @@
   width: 88px;
   height: 50px;
   object-fit: cover;
+  transition: width 0.45s cubic-bezier(0.3, 0.7, 0.2, 1);
   border-radius: 6px;
   background: var(--screen);
   border: 3px solid var(--screen);
@@ -254,7 +257,7 @@
   background: var(--surface);
   border: 1px solid var(--rule);
   border-bottom-color: var(--key-edge);
-  border-radius: 6px;
+  border-radius: 3px;
   cursor: pointer;
   text-align: left;
 }
@@ -280,14 +283,14 @@
   max-height: var(--radix-select-content-available-height);
   background: var(--surface);
   border: 1px solid var(--rule);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 3px;
   font-family: var(--mono);
   font-size: 13px;
 }
 .select__item {
   padding: 6px 10px;
-  border-radius: 4px;
+  border-radius: 2px;
   cursor: pointer;
   outline: none;
   user-select: none;
@@ -309,7 +312,7 @@
 .bankbtn {
   width: 30px;
   height: 30px;
-  border-radius: 6px;
+  border-radius: 3px;
   border: 1px solid var(--rule);
   background: var(--surface);
   border-bottom: 3px solid var(--bank);
@@ -328,10 +331,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  height: 36px;
-  padding: 0 16px 0 12px;
-  margin-left: auto;
-  border-radius: 18px;
+  height: 30px;
+  padding: 0 12px 0 10px;
+  border-radius: 4px;
   border: 1px solid var(--rule);
   border-bottom-color: var(--key-edge);
   background: var(--surface);
@@ -342,8 +344,14 @@
   background: var(--tint);
 }
 .recbtn__dot {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
+}
+/* bank selector and its record button share one row */
+.bankrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .recbtn[data-state='on'],
 .recbtn[data-state='on']:hover:not(:disabled) {
@@ -373,25 +381,57 @@
 
 /* ---------- stage + banks ---------- */
 
-.rack--main {
+.rack--body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  /* Vertical space taken by everything except the stage; the stage shrinks so the sequencer stays in view. */
+  --chrome-h: 376px;
+}
+.divider {
+  width: 100%;
+  margin: 0;
+  border: none;
+  border-top: 1px solid var(--rule);
+}
+.mainrow {
   display: flex;
   justify-content: center;
   gap: 12px;
-  /* Vertical space taken by everything except the stage; the stage shrinks so the sequencer stays in view. */
-  --chrome-h: 387px;
 }
 @media (max-width: 1000px) {
-  .rack--main {
+  .mainrow {
     flex-direction: column;
   }
 }
 
+/* Registered so it can be transitioned: drives both the stage width and the
+   frame aspect ratio, so flipping orientation morphs instead of jumping. */
+@property --w-per-h {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1.7778;
+}
 .stage {
+  /* width per unit of height (= aspect ratio) */
+  --w-per-h: 1.7778;
+  transition: --w-per-h 0.45s cubic-bezier(0.3, 0.7, 0.2, 1);
   display: flex;
   flex-direction: column;
   min-width: 0;
   flex: 0 1 auto;
-  width: min(100%, max(400px, calc((100vh - var(--chrome-h)) * 16 / 9 + 12px)));
+  /* height budget is the viewport minus everything else, floored at --stage-min-h;
+     the floor is a height so it never overflows in portrait (a width floor would) */
+  --stage-min-h: 220px;
+  width: min(100%, calc(max(var(--stage-min-h), 100vh - var(--chrome-h)) * var(--w-per-h) + 12px));
+}
+.stage--portrait {
+  --w-per-h: 0.5625;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage {
+    transition: none;
+  }
 }
 .stage__bezel {
   padding: 6px;
@@ -400,7 +440,7 @@
 }
 .stage__frame {
   position: relative;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: var(--w-per-h);
   border-radius: 3px;
   overflow: hidden;
   background: #000;
@@ -409,6 +449,8 @@
   display: block;
   width: 100%;
   height: 100%;
+  /* the canvas flips resolution instantly; contain it while the frame morphs */
+  object-fit: contain;
 }
 .stage__off {
   position: absolute;
@@ -428,7 +470,7 @@
   align-items: center;
   gap: 6px;
   padding: 4px 8px;
-  border-radius: 12px;
+  border-radius: 4px;
   background: #141414b3;
   color: #fff;
   font-size: 11px;
@@ -438,6 +480,35 @@
 .stage__frame:hover .stage__controls,
 .stage__controls:focus-within {
   opacity: 1;
+}
+.stage__sep {
+  width: 1px;
+  height: 12px;
+  background: #ffffff40;
+}
+.orient {
+  display: flex;
+  gap: 2px;
+}
+.orient__item {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 2px;
+  background: transparent;
+  color: #fffa;
+  cursor: pointer;
+}
+.orient__item[data-state='on'] {
+  background: #fff;
+  color: var(--ink);
+}
+.orient__item:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 .stage__reset {
   background: none;
@@ -562,6 +633,41 @@
   width: 100%;
   font-variant-numeric: tabular-nums;
 }
+
+/* Portrait: monitors match the stage's 9:16 centre crop (object-fit: cover). */
+.bank__thumb {
+  transition: width 0.45s cubic-bezier(0.3, 0.7, 0.2, 1), height 0.45s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+.app--portrait .sourcebar__preview {
+  /* 44px of picture height inside the 3px border → 9:16 */
+  width: 31px;
+}
+.app--portrait .bank__head {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  width: 92px;
+}
+.app--portrait .bank__thumbtext {
+  font-size: 9px;
+}
+.app--portrait .bank__thumb {
+  flex: none;
+  width: 36px;
+  height: 64px;
+}
+.app--portrait .bank__meta {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sourcebar__preview,
+  .bank__thumb {
+    transition: none;
+  }
+}
 .bank__knobs {
   display: flex;
   justify-content: space-around;
@@ -653,10 +759,8 @@
   gap: 8px;
   margin-left: auto;
   height: 32px;
-  padding: 0 10px;
-  border: 1px solid var(--rule);
-  border-radius: 6px;
-  background: var(--surface);
+  /* sits directly on the transport row, no box of its own */
+  padding: 0 6px;
 }
 .master__meter {
   display: grid;
@@ -685,19 +789,13 @@
   width: 90px;
 }
 
-.bpm {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 6px;
-}
 .lcd {
   display: flex;
-  align-items: baseline;
-  gap: 4px;
+  align-items: center;
+  gap: 12px;
   height: 32px;
-  padding: 0 10px;
-  border-radius: 6px;
+  padding: 0 12px 0 10px;
+  border-radius: 3px;
   background: var(--screen);
   color: #fff;
 }
@@ -710,12 +808,11 @@
   line-height: 32px;
   font-variant-numeric: tabular-nums;
   color: #fff;
-  -moz-appearance: textfield;
 }
-.lcd__num::-webkit-inner-spin-button,
-.lcd__num::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+.lcd__readout {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
 }
 .lcd__unit {
   font-size: 11px;
@@ -726,7 +823,7 @@
 .slider {
   -webkit-appearance: none;
   appearance: none;
-  width: 150px;
+  width: 100px;
   height: 16px;
   background: transparent;
   cursor: pointer;
@@ -823,4 +920,21 @@
 .pad--head {
   outline: 2px solid var(--ink);
   outline-offset: -2px;
+}
+
+/* BPM slider lives inside the black display */
+.slider--lcd {
+  width: 90px;
+}
+.slider--lcd::-webkit-slider-runnable-track {
+  background: #ffffff55;
+}
+.slider--lcd::-moz-range-track {
+  background: #ffffff55;
+}
+.slider--lcd::-webkit-slider-thumb {
+  border-color: var(--screen);
+}
+.slider--lcd::-moz-range-thumb {
+  border-color: var(--screen);
 }
