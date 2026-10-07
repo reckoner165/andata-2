@@ -1,6 +1,6 @@
 import type { Clip } from './Clip';
 import { DEFAULT_ENVELOPE, type Envelope } from './envelope';
-import { defaultFx, type DuotoneFx } from './fx';
+import { DEFAULT_CRUSH, defaultFx, type CrushFx, type DuotoneFx } from './fx';
 import { Voice } from './Voice';
 
 const MAX_VOICES = 4;
@@ -17,6 +17,7 @@ export class Bank {
   envelope: Envelope = { ...DEFAULT_ENVELOPE };
   /** Video effect for this bank's tile; colours live in the matching SVG filter. */
   fx: DuotoneFx = defaultFx('#ffffff');
+  crush: CrushFx = { ...DEFAULT_CRUSH };
   readonly gain: GainNode;
   readonly panner: StereoPannerNode;
 

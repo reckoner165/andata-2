@@ -1,8 +1,8 @@
 import { Bank } from './Bank';
 import { downloadBlob, startCapture, type Capture } from './capture';
 import { Clip } from './Clip';
-import { duotoneFilterId } from './fx';
-import { drawCover, tileRects } from './layout';
+import { drawWithFx } from './fx';
+import { tileRects } from './layout';
 import { Sequencer, STEPS } from './Sequencer';
 
 export const BANK_COUNT = 4;
@@ -36,6 +36,8 @@ export class Engine {
   private lastStep = -1;
   private clipCapture: Capture | null = null;
   private bounce: { capture: Capture; stream: MediaStream } | null = null;
+  /** Per-bank scratch canvases for pixelation. */
+  private scratch: HTMLCanvasElement[] = [];
 
   attachCanvas(canvas: HTMLCanvasElement | null) {
     this.canvas = canvas;
@@ -222,9 +224,8 @@ export class Engine {
     active.forEach((b, i) => {
       const img = b.frame(now);
       if (!img) return;
-      if (b.fx.amount > 0) g.filter = `url(#${duotoneFilterId(b.index)})`;
-      drawCover(g, img, rects[i]);
-      g.filter = 'none';
+      const scratch = (this.scratch[b.index] ??= document.createElement('canvas'));
+      drawWithFx(g, img, rects[i], b.index, b.fx, b.crush, scratch);
     });
 
     const step = this.seq?.currentStep(now) ?? -1;

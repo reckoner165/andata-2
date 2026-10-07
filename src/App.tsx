@@ -145,11 +145,12 @@ export default function App() {
     if (patch.pan !== undefined) b.setPan(patch.pan);
     if (patch.envelope !== undefined) b.envelope = patch.envelope;
     if (patch.fx !== undefined) b.fx = patch.fx;
+    if (patch.crush !== undefined) b.crush = patch.crush;
   };
 
   const copyFxToAll = (from: number) => {
-    const fx = banks[from].fx;
-    banks.forEach((_, i) => changeBank(i, { fx: { ...fx } }));
+    const { fx, crush } = banks[from];
+    banks.forEach((_, i) => changeBank(i, { fx: { ...fx }, crush: { ...crush } }));
   };
 
   const clearBank = (i: number) => {
@@ -278,7 +279,7 @@ export default function App() {
   return (
     <Tooltip.Provider delayDuration={300}>
       <div className={`app app--${orientation}`}>
-        <FxFilters fx={banks.map((b) => b.fx)} />
+        <FxFilters effects={banks.map(({ fx, crush }) => ({ fx, crush }))} />
         <header className="topbar">
           <PowerSwitch on={power} busy={powerBusy} onToggle={togglePower} />
           <div className="brand">
@@ -343,7 +344,7 @@ export default function App() {
                 <VideoFxPanel
                   banks={banks}
                   orientation={orientation}
-                  onChange={(i, fx) => changeBank(i, { fx })}
+                  onChange={(i, patch) => changeBank(i, patch)}
                   onCopyToAll={copyFxToAll}
                 />
               }

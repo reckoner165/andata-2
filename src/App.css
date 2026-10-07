@@ -1101,6 +1101,8 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  /* don't let the effect list set the column height: fill it, scroll inside if short */
+  contain: size;
 }
 .fx__tabs {
   display: flex;
@@ -1185,6 +1187,11 @@
   width: 63px;
   height: 112px;
 }
+.fx__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 .fx__preview img {
   width: 100%;
   height: 100%;
@@ -1214,14 +1221,20 @@
   gap: 10px;
   min-width: 0;
 }
-.fxsec + .fxsec {
-  padding-top: 10px;
+/* each effect is bracketed by dividers; neighbours share the line between them */
+.fxsec {
+  padding: 8px 0;
   border-top: 1px solid var(--line);
+}
+.fxsec:last-child {
+  border-bottom: 1px solid var(--line);
 }
 .fxsec__name {
   margin: 0 0 4px;
   font-size: 11px;
   font-weight: normal;
+  /* sits over its controls, which are right-aligned */
+  text-align: right;
 }
 .fxsec__controls {
   display: flex;

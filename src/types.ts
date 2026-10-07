@@ -1,5 +1,5 @@
 import { DEFAULT_ENVELOPE, type Envelope } from './engine/envelope';
-import { defaultFx, type DuotoneFx } from './engine/fx';
+import { DEFAULT_CRUSH, defaultFx, type CrushFx, type DuotoneFx } from './engine/fx';
 
 // Wada Sanzo, classic combination 289, in the published order:
 // Lemon Yellow, Light Green Yellow, Violet Blue, Dull Violet Black.
@@ -28,6 +28,7 @@ export interface BankUI {
   /** Strip shows the envelope editor instead of trim/gain/pan. */
   showAdsr: boolean;
   fx: DuotoneFx;
+  crush: CrushFx;
 }
 
 export const emptyBank = (index: number): BankUI => ({
@@ -43,6 +44,7 @@ export const emptyBank = (index: number): BankUI => ({
   envelope: { ...DEFAULT_ENVELOPE },
   showAdsr: false,
   fx: defaultFx(BANK_SCREEN[index]),
+  crush: { ...DEFAULT_CRUSH },
 });
 
 export const fmtTime = (s: number) => `${s.toFixed(2)}s`;

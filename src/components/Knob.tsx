@@ -11,6 +11,8 @@ interface KnobProps {
   color?: string;
   size?: number;
   disabled?: boolean;
+  /** Snap to multiples of `step` (keys and wheel move one step at a time). */
+  step?: number;
   /** Draw the value arc from 12 o'clock (for centred controls like pan). */
   bipolar?: boolean;
 }
@@ -42,18 +44,24 @@ export function Knob({
   size = 40,
   disabled,
   bipolar,
+  step,
 }: KnobProps) {
   const ref = useRef<HTMLDivElement>(null);
   const drag = useRef<{ y: number; v: number } | null>(null);
   const range = max - min || 1;
-  const clamp = (v: number) => Math.min(max, Math.max(min, v));
+  const clamp = (v: number) => {
+    const snapped = step ? min + Math.round((v - min) / step) * step : v;
+    return Math.min(max, Math.max(min, snapped));
+  };
+  // keyboard / wheel increment: one step when stepped, else a fraction of the range
+  const nudge = (fine: boolean, coarse: number, fineDiv: number) => (step ? step : range / (fine ? fineDiv : coarse));
   const norm = (clamp(value) - min) / range;
   const angle = START + norm * SWEEP;
   const origin = bipolar ? START + SWEEP / 2 : START;
 
   // Keep the latest props for the native (non-passive) wheel listener.
-  const latest = useRef({ value, onChange, clamp, range, disabled });
-  latest.current = { value, onChange, clamp, range, disabled };
+  const latest = useRef({ value, onChange, clamp, nudge, disabled });
+  latest.current = { value, onChange, clamp, nudge, disabled };
 
   useEffect(() => {
     const el = ref.current!;
@@ -61,7 +69,7 @@ export function Knob({
       const l = latest.current;
       if (l.disabled) return;
       e.preventDefault();
-      l.onChange(l.clamp(l.value - (Math.sign(e.deltaY) * l.range) / (e.shiftKey ? 400 : 80)));
+      l.onChange(l.clamp(l.value - Math.sign(e.deltaY) * l.nudge(e.shiftKey, 80, 400)));
     };
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => el.removeEventListener('wheel', onWheel);
@@ -101,7 +109,7 @@ export function Knob({
         onDoubleClick={() => !disabled && onChange(defaultValue)}
         onKeyDown={(e) => {
           if (disabled) return;
-          const step = range / (e.shiftKey ? 200 : 50);
+          const step = nudge(e.shiftKey, 50, 200);
           if (e.key === 'ArrowUp' || e.key === 'ArrowRight') onChange(clamp(value + step));
           else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') onChange(clamp(value - step));
           else return;
