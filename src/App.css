@@ -132,6 +132,11 @@
   background: var(--bank, var(--accent));
   border-color: color-mix(in srgb, var(--bank, var(--accent)), #000 15%);
 }
+.toggle--ink {
+  color: var(--bg);
+  background: var(--ink);
+  border-color: var(--ink);
+}
 
 /* ---------- top bar ---------- */
 
@@ -581,12 +586,14 @@
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  width: 80px;
+  /* same width in every mode (thumbnail, portrait thumbnail, ADSR curve) so knobs never move */
+  width: 92px;
 }
 .bank__thumb {
   position: relative;
-  width: 80px;
-  height: 45px;
+  /* 16:9, same footprint as the ADSR curve */
+  width: 92px;
+  height: 52px;
   border-radius: 4px;
   border: 2px solid var(--screen);
   background: var(--screen);
@@ -650,7 +657,6 @@
   flex-direction: row;
   align-items: center;
   gap: 6px;
-  width: 92px;
 }
 .app--portrait .bank__thumbtext {
   font-size: 9px;
@@ -680,8 +686,14 @@
 .bank__actions {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   align-items: stretch;
+}
+/* three stacked controls: keep them short so the strip fits small viewports */
+.bank__actions .toggle,
+.bank__actions .btn--small {
+  height: 20px;
+  font-size: 10px;
 }
 
 /* ---------- knob (OP-1 style encoder) ---------- */
@@ -691,6 +703,8 @@
   flex-direction: column;
   align-items: center;
   gap: 1px;
+  /* fixed, so a longer label or readout ("release", "128ms") never shifts its neighbours */
+  width: 52px;
   user-select: none;
 }
 .knob__dial {
@@ -942,3 +956,44 @@
 .slider--lcd::-moz-range-thumb {
   border-color: var(--screen);
 }
+
+/* ---------- ADSR mode ---------- */
+
+/* The curve needs width even when the stage is vertical: keep the head horizontal. */
+.app .bank--adsr .bank__head {
+  flex-direction: column;
+}
+.adsr {
+  position: relative;
+  flex: none;
+  border-radius: 4px;
+  background: var(--screen);
+  overflow: hidden;
+}
+.adsr svg {
+  display: block;
+}
+.adsr__play {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  background: #ffffff26;
+  color: #fff;
+  cursor: pointer;
+}
+.adsr__play:hover:not(:disabled) {
+  background: var(--bank);
+  color: var(--ink);
+}
+.adsr__play:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+

@@ -1,5 +1,6 @@
 import { CanvasSink, type WrappedCanvas } from 'mediabunny';
 import type { Clip } from './Clip';
+import { envelopeBreakpoints, MIN_RELEASE, valueAt, type Breakpoints, type Envelope } from './envelope';
 
 /**
  * One triggered playback of a clip between trimStart and trimEnd, starting at AudioContext time `when`.
@@ -8,12 +9,18 @@ import type { Clip } from './Clip';
  */
 export class Voice {
   readonly when: number;
+  /** When the video stops showing (clip end, or the moment it was choked). */
   stopAt: number;
+  /** When the audio has fully released; the voice is kept alive until then. */
+  audioEnd: number;
 
   private readonly clip: Clip;
   private readonly actx: AudioContext;
   private readonly trimStart: number;
   private readonly src: AudioBufferSourceNode | null = null;
+  private readonly envGain: GainNode | null = null;
+  private readonly release: number;
+  private points: Breakpoints;
   private readonly iter: AsyncGenerator<WrappedCanvas, void, unknown>;
   private current: WrappedCanvas | null = null;
   private next: WrappedCanvas | null = null;
@@ -21,20 +28,36 @@ export class Voice {
   private done = false;
   private disposed = false;
 
-  constructor(clip: Clip, actx: AudioContext, out: AudioNode, when: number, trimStart: number, trimEnd: number) {
+  constructor(
+    clip: Clip,
+    actx: AudioContext,
+    out: AudioNode,
+    when: number,
+    trimStart: number,
+    trimEnd: number,
+    env: Envelope,
+  ) {
     this.clip = clip;
     this.actx = actx;
     this.trimStart = trimStart;
     this.when = when;
     const dur = trimEnd - trimStart;
     this.stopAt = when + dur;
+    this.audioEnd = when + dur;
+    this.release = Math.max(env.release, MIN_RELEASE);
+    this.points = envelopeBreakpoints(env, dur);
 
     if (clip.audio && trimStart < clip.audio.duration) {
       const src = actx.createBufferSource();
       src.buffer = clip.audio;
-      src.connect(out);
+      const envGain = actx.createGain();
+      const g = envGain.gain;
+      g.setValueAtTime(0, when);
+      for (const [t, v] of this.points.slice(1)) g.linearRampToValueAtTime(v, when + t);
+      src.connect(envGain).connect(out);
       src.start(when, trimStart, dur);
       this.src = src;
+      this.envGain = envGain;
     }
 
     // Each voice gets its own sink so canvas pools are never shared between concurrent iterators.
@@ -87,11 +110,24 @@ export class Voice {
     return this.current?.canvas ?? null;
   }
 
+  /** Choke: video cuts at `at`; audio releases from its current level over the release time. */
   stop(at: number) {
     if (at >= this.stopAt) return;
-    this.stopAt = Math.max(at, this.when);
+    at = Math.max(at, this.when);
+    this.stopAt = at;
+    const end = Math.min(this.audioEnd, at + this.release);
+    this.audioEnd = end;
+    if (!this.src || !this.envGain) return;
+    const g = this.envGain.gain;
+    const level = valueAt(this.points, at - this.when);
+    if (typeof g.cancelAndHoldAtTime === 'function') g.cancelAndHoldAtTime(at);
+    else {
+      g.cancelScheduledValues(at);
+      g.setValueAtTime(level, at);
+    }
+    g.linearRampToValueAtTime(0, end);
     try {
-      this.src?.stop(this.stopAt);
+      this.src.stop(end);
     } catch {
       /* already stopped */
     }
@@ -106,6 +142,7 @@ export class Voice {
       /* already stopped */
     }
     this.src?.disconnect();
+    this.envGain?.disconnect();
     this.current = this.next = null;
     this.iter.return().catch(() => {});
   }

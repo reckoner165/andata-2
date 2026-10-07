@@ -1,4 +1,5 @@
 import type { Clip } from './Clip';
+import { DEFAULT_ENVELOPE, type Envelope } from './envelope';
 import { Voice } from './Voice';
 
 const MAX_VOICES = 4;
@@ -11,6 +12,8 @@ export class Bank {
   trimEnd = 0;
   /** When true, a retrigger cuts the previous voice; otherwise voices overlap. */
   choke = true;
+  /** Applied to voices triggered from now on. */
+  envelope: Envelope = { ...DEFAULT_ENVELOPE };
   readonly gain: GainNode;
   readonly panner: StereoPannerNode;
 
@@ -53,7 +56,7 @@ export class Bank {
       const sounding = this.voices.filter((v) => v.stopAt > when);
       for (let i = 0; i <= sounding.length - MAX_VOICES; i++) sounding[i].stop(when);
     }
-    this.voices.push(new Voice(clip, this.actx, this.gain, when, this.trimStart, this.trimEnd));
+    this.voices.push(new Voice(clip, this.actx, this.gain, when, this.trimStart, this.trimEnd, this.envelope));
   }
 
   /** Newest voice sounding at `now`. */
@@ -78,7 +81,8 @@ export class Bank {
   cleanup(now: number) {
     if (!this.voices.length) return;
     this.voices = this.voices.filter((v) => {
-      if (v.stopAt > now) return true;
+      // keep choked voices alive until their release tail has finished
+      if (Math.max(v.stopAt, v.audioEnd) > now) return true;
       v.dispose();
       return false;
     });

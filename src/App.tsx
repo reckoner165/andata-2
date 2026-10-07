@@ -140,6 +140,7 @@ export default function App() {
     if (patch.choke !== undefined) b.choke = patch.choke;
     if (patch.gain !== undefined) b.setGain(patch.gain);
     if (patch.pan !== undefined) b.setPan(patch.pan);
+    if (patch.envelope !== undefined) b.envelope = patch.envelope;
   };
 
   const clearBank = (i: number) => {

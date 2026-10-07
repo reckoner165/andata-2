@@ -1,3 +1,5 @@
+import { DEFAULT_ENVELOPE, type Envelope } from './engine/envelope';
+
 export const BANK_COLORS = ['#ff5a36', '#ffc531', '#3ddc97', '#4aa8ff'];
 
 export interface BankUI {
@@ -11,6 +13,9 @@ export interface BankUI {
   gain: number;
   /** -1 (left) … 1 (right). */
   pan: number;
+  envelope: Envelope;
+  /** Strip shows the envelope editor instead of trim/gain/pan. */
+  showAdsr: boolean;
 }
 
 export const emptyBank = (): BankUI => ({
@@ -23,6 +28,8 @@ export const emptyBank = (): BankUI => ({
   choke: true,
   gain: 1,
   pan: 0,
+  envelope: { ...DEFAULT_ENVELOPE },
+  showAdsr: false,
 });
 
 export const fmtTime = (s: number) => `${s.toFixed(2)}s`;
