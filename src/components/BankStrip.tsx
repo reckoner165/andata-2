@@ -1,5 +1,5 @@
 import type { Envelope } from '../engine/envelope';
-import { BANK_COLORS, fmtTime, type BankUI } from '../types';
+import { BANK_COLORS, BANK_SCREEN, bankStyle, fmtTime, type BankUI } from '../types';
 import { AdsrViz } from './AdsrViz';
 import { CrossIcon, IconButton } from './IconButton';
 import { Knob } from './Knob';
@@ -40,11 +40,11 @@ export function BankStrip({ index, bank, recording, onChange, onAudition, onClea
   const setEnv = (patch: Partial<Envelope>) => onChange({ envelope: { ...env, ...patch } });
 
   return (
-    <div className={`bank${recording ? ' bank--rec' : ''}${bank.showAdsr ? ' bank--adsr' : ''}`} style={{ '--bank': color } as React.CSSProperties}>
+    <div className={`bank${recording ? ' bank--rec' : ''}${bank.showAdsr ? ' bank--adsr' : ''}`} style={bankStyle(index)}>
       {bank.showAdsr ? (
         <>
           <div className="bank__head">
-            <AdsrViz envelope={env} color={color} onPlay={onAudition} playDisabled={empty} />
+            <AdsrViz envelope={env} color={BANK_SCREEN[index]} onPlay={onAudition} playDisabled={empty} />
           </div>
           <div className="bank__knobs">
             {(['attack', 'decay'] as const).map((k) => (

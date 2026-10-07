@@ -11,9 +11,9 @@
 
 :root {
   /* two quiet levels (page, group panel); hairlines for structure, ink for state */
-  --bg: #ebeae5;
-  --panel: #f3f2ee;
-  --surface: #f9f8f5;
+  --bg: #e5e4df;
+  --panel: #e9e8e3;
+  --surface: #edece7;
   --tint: #14141408;
   --rule: #c2c1b8;
   --line: #d8d7cf;

@@ -11,7 +11,8 @@
 
 /* Group sections: flat, outlined with a hard ink rule. */
 .rack {
-  border: 1px solid var(--rule);
+  /* hairline: one device pixel on retina */
+  border: 0.5px solid var(--rule);
   border-radius: 10px;
   background-color: var(--panel);
   background-image: var(--grain);
@@ -128,7 +129,7 @@
   color: var(--muted);
 }
 .toggle--on {
-  color: var(--ink);
+  color: var(--bank-ink, var(--ink));
   background: var(--bank, var(--accent));
   border-color: color-mix(in srgb, var(--bank, var(--accent)), #000 15%);
 }
@@ -168,7 +169,7 @@
   height: 36px;
   border: 1px solid var(--key-edge);
   border-radius: 5px;
-  background: #dcdbd3;
+  background: #d6d5cd;
   transition: background 0.15s, border-color 0.15s;
 }
 .power__thumb {
@@ -329,6 +330,7 @@
 }
 .bankbtn[data-state='on'] {
   background: var(--bank);
+  color: var(--bank-ink);
   border-color: color-mix(in srgb, var(--bank), #000 15%);
 }
 .bankbtn:disabled:not([data-state='on']) {
@@ -401,7 +403,7 @@
   width: 100%;
   margin: 0;
   border: none;
-  border-top: 1px solid var(--rule);
+  border-top: 0.5px solid var(--rule);
 }
 .mainrow {
   display: flex;
@@ -553,7 +555,7 @@
   flex-direction: column;
   flex: 1 1 360px;
   max-width: 460px;
-  border: 1px solid var(--rule);
+  border: 0.5px solid var(--rule);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -620,7 +622,7 @@
   height: 14px;
   border-radius: 0 0 3px 0;
   background: var(--bank);
-  color: var(--ink);
+  color: var(--bank-ink);
   font-size: 11px;
   line-height: 14px;
   text-align: center;
@@ -732,7 +734,7 @@
   stroke-linecap: round;
 }
 .knob__cap {
-  fill: #dcdbd3;
+  fill: #d6d5cd;
   stroke: #00000024;
   stroke-width: 1;
 }
@@ -892,6 +894,7 @@
   height: 24px;
   border-radius: 5px;
   background: var(--bank);
+  color: var(--bank-ink);
   text-align: center;
   line-height: 24px;
 }
@@ -923,7 +926,7 @@
   transition: background 0.06s;
 }
 .seq__group .pad:first-child {
-  background: #f0efea;
+  background: #e8e7e2;
 }
 .pad:hover {
   border-color: var(--line-strong);
@@ -938,6 +941,10 @@
 .pad--head {
   outline: 2px solid var(--ink);
   outline-offset: -2px;
+}
+/* on a lit step the playhead uses the bank's text colour, so it shows on dark banks too */
+.pad--on.pad--head {
+  outline-color: var(--bank-ink);
 }
 
 /* BPM slider lives inside the black display */
@@ -990,7 +997,7 @@
 }
 .adsr__play:hover:not(:disabled) {
   background: var(--bank);
-  color: var(--ink);
+  color: var(--bank-ink);
 }
 .adsr__play:disabled {
   opacity: 0.3;

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { ContextMenu, Tabs } from 'radix-ui';
 import type { Orientation } from '../engine/Engine';
 import { duotoneFilterId, type DuotoneFx } from '../engine/fx';
-import { BANK_COLORS, type BankUI } from '../types';
+import { BANK_COLORS, bankStyle, type BankUI } from '../types';
 import { Knob } from './Knob';
 
 interface Props {
@@ -47,7 +47,7 @@ export function VideoFxPanel({ banks, orientation, onChange, onCopyToAll }: Prop
               <Tabs.Trigger
                 value={String(i)}
                 className="fx__tab"
-                style={{ '--bank': BANK_COLORS[i] } as React.CSSProperties}
+                style={bankStyle(i)}
                 title="Right-click: copy to all banks"
               >
                 bank {i + 1}
@@ -71,7 +71,7 @@ export function VideoFxPanel({ banks, orientation, onChange, onCopyToAll }: Prop
         const set = (patch: Partial<DuotoneFx>) => onChange(i, { ...fx, ...patch });
         const color = BANK_COLORS[i];
         return (
-          <Tabs.Content key={i} value={String(i)} className="fx__body" style={{ '--bank': color } as React.CSSProperties}>
+          <Tabs.Content key={i} value={String(i)} className="fx__body" style={bankStyle(i)}>
             <div className="fx__title">
               <span>effects</span>
               <span className="field__label">bank {i + 1}</span>

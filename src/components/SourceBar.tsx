@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Select, Toggle, ToggleGroup } from 'radix-ui';
-import { BANK_COLORS } from '../types';
+import { BANK_COLORS, bankStyle } from '../types';
 
 interface Props {
   videoDevices: MediaDeviceInfo[];
@@ -90,12 +90,12 @@ export function SourceBar(p: Props) {
             disabled={p.recording}
             aria-label="Record into bank (keys 1–4)"
           >
-            {BANK_COLORS.map((color, i) => (
+            {BANK_COLORS.map((_, i) => (
               <ToggleGroup.Item
                 key={i}
                 value={String(i)}
                 className="bankbtn"
-                style={{ '--bank': color } as React.CSSProperties}
+                style={bankStyle(i)}
                 title={`Bank ${i + 1} (key ${i + 1})`}
               >
                 {i + 1}

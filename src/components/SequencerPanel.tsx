@@ -1,5 +1,5 @@
 import { useRef, useState, type ReactNode } from 'react';
-import { BANK_COLORS } from '../types';
+import { bankStyle } from '../types';
 import { ClearIcon, IconButton, PlayIcon, RandomIcon, StopIcon } from './IconButton';
 
 interface Props {
@@ -134,7 +134,7 @@ export function SequencerPanel(p: Props) {
           <div
             key={b}
             className={`seq__row${p.hasClip[b] ? '' : ' seq__row--empty'}`}
-            style={{ '--bank': BANK_COLORS[b] } as React.CSSProperties}
+            style={bankStyle(b)}
           >
             <span className="seq__rowlabel">{b + 1}</span>
             {GROUPS.map((g) => (
