@@ -11,6 +11,8 @@ interface Props {
   bounceElapsed: number;
   bounceBusy: boolean;
   hasClip: boolean[];
+  muted: boolean[];
+  onToggleMute: (bank: number) => void;
   onToggleCell: (bank: number, step: number) => void;
   onPlayToggle: () => void;
   onBpm: (bpm: number) => void;
@@ -133,10 +135,18 @@ export function SequencerPanel(p: Props) {
         {p.grid.map((row, b) => (
           <div
             key={b}
-            className={`seq__row${p.hasClip[b] ? '' : ' seq__row--empty'}`}
+            className={`seq__row${p.hasClip[b] ? '' : ' seq__row--empty'}${p.muted[b] ? ' seq__row--muted' : ''}`}
             style={bankStyle(b)}
           >
-            <span className="seq__rowlabel">{b + 1}</span>
+            <button
+              className="seq__rowlabel"
+              aria-pressed={!p.muted[b]}
+              aria-label={`Bank ${b + 1} pattern ${p.muted[b] ? 'muted' : 'active'}`}
+              title={p.muted[b] ? `Unmute bank ${b + 1}` : `Mute bank ${b + 1}`}
+              onClick={() => p.onToggleMute(b)}
+            >
+              {b + 1}
+            </button>
             {GROUPS.map((g) => (
               <div key={g} className="seq__group">
                 {row.slice(g * 4, g * 4 + 4).map((on, k) => {

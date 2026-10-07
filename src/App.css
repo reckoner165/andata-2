@@ -943,11 +943,26 @@
 .seq__rowlabel {
   width: 24px;
   height: 24px;
+  padding: 0;
+  border: 1.5px solid var(--bank);
   border-radius: 5px;
   background: var(--bank);
   color: var(--bank-ink);
   text-align: center;
-  line-height: 24px;
+  line-height: 21px;
+  cursor: pointer;
+}
+.seq__rowlabel:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+/* muted row: hollow label, faded pads */
+.seq__row--muted .seq__rowlabel {
+  background: transparent;
+  color: var(--muted);
+}
+.seq__row--muted .pad {
+  opacity: 0.3;
 }
 .seq__row--empty .seq__rowlabel {
   opacity: 0.35;

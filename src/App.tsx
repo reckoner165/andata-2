@@ -37,6 +37,7 @@ export default function App() {
   const [banks, setBanks] = useState<BankUI[]>(() => Array.from({ length: BANK_COUNT }, (_, i) => emptyBank(i)));
 
   const [grid, setGrid] = useState(emptyGrid);
+  const [muted, setMuted] = useState<boolean[]>(() => Array(BANK_COUNT).fill(false));
   const [step, setStep] = useState(-1);
   const [playing, setPlaying] = useState(false);
   const [bpm, setBpm] = useState(120);
@@ -360,6 +361,12 @@ export default function App() {
             bounceElapsed={(now - bounceStart) / 1000}
             bounceBusy={bounceBusy}
             hasClip={banks.map((b) => b.hasClip)}
+            muted={muted}
+            onToggleMute={(i) => {
+              const next = muted.map((m, j) => (j === i ? !m : m));
+              setMuted(next);
+              engine.setMuted(i, next[i]);
+            }}
             onToggleCell={toggleCell}
             onPlayToggle={togglePlay}
             onBpm={setBpm}

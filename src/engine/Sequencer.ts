@@ -7,6 +7,8 @@ const TICK_MS = 25;
 export interface SequencerState {
   grid: boolean[][];
   bpm: number;
+  /** Muted rows are never triggered (no voices, no decoding). */
+  muted: boolean[];
 }
 
 /** Lookahead step scheduler driven by the AudioContext clock (16th-note steps). */
@@ -47,11 +49,11 @@ export class Sequencer {
   }
 
   private tick() {
-    const { grid, bpm } = this.getState();
+    const { grid, bpm, muted } = this.getState();
     const horizon = this.actx.currentTime + LOOKAHEAD;
     while (this.nextTime < horizon) {
       for (let b = 0; b < this.banks.length; b++) {
-        if (grid[b]?.[this.nextStep]) this.banks[b].trigger(this.nextTime);
+        if (grid[b]?.[this.nextStep] && !muted[b]) this.banks[b].trigger(this.nextTime);
       }
       this.queue.push({ step: this.nextStep, time: this.nextTime });
       this.nextTime += 60 / bpm / 4;

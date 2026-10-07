@@ -18,6 +18,7 @@ export const emptyGrid = () => Array.from({ length: BANK_COUNT }, () => Array<bo
 /** Owns the audio graph, banks, sequencer, compositor loop and recorders. Framework-free. */
 export class Engine {
   grid: boolean[][] = emptyGrid();
+  muted: boolean[] = Array(BANK_COUNT).fill(false);
   bpm = 120;
   bg = '#000000';
   banks: Bank[] = [];
@@ -156,6 +157,12 @@ export class Engine {
       return peak;
     });
     return [peaks[0] ?? 0, peaks[1] ?? 0];
+  }
+
+  /** Mute a sequencer row: it stops triggering, and anything it is playing is released now. */
+  setMuted(i: number, muted: boolean) {
+    this.muted[i] = muted;
+    if (muted) this.banks[i]?.stopAll();
   }
 
   // ---- transport ----
