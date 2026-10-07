@@ -12,6 +12,8 @@ export class Clip {
   readonly duration: number;
   readonly renderWidth: number;
   readonly thumbUrl: string | null;
+  /** size of the recorded MP4, bytes */
+  fileBytes = 0;
 
   private constructor(
     input: Input,
@@ -42,7 +44,9 @@ export class Clip {
 
       const audio = await decodeAudio(input, actx, t0, duration);
       const thumbUrl = await makeThumbnail(videoTrack, t0);
-      return new Clip(input, videoTrack, audio, t0, duration, thumbUrl);
+      const clip = new Clip(input, videoTrack, audio, t0, duration, thumbUrl);
+      clip.fileBytes = blob.size;
+      return clip;
     } catch (e) {
       input.dispose();
       throw e;

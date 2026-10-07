@@ -1324,3 +1324,84 @@
   outline: 2px solid var(--ink);
   outline-offset: -2px;
 }
+
+/* ---------- perf tab ---------- */
+
+.banks__tab--end {
+  margin-left: auto;
+}
+.perf {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 8px;
+  padding: 8px 12px;
+  /* sized to fit; only scrolls as a fallback on very short windows */
+  overflow: auto;
+  /* fill the column; never set its height */
+  contain: size;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.perf__status {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 13px;
+}
+.perf__global {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+.perf__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 1px 0;
+  border-bottom: 1px solid var(--line);
+  line-height: 1.5;
+}
+.perf__label {
+  color: var(--muted);
+}
+.perf__value {
+  text-align: right;
+  white-space: nowrap;
+}
+.perf__value--warn {
+  color: #b86b00;
+}
+.perf__value--bad {
+  color: var(--rec);
+}
+.perf__banks {
+  width: 100%;
+  border-collapse: collapse;
+}
+.perf__banks th,
+.perf__banks td {
+  padding: 1px 4px;
+  border-bottom: 1px solid var(--line);
+  text-align: right;
+  white-space: nowrap;
+}
+.perf__banks tbody th {
+  font-weight: normal;
+  text-align: left;
+  color: var(--muted);
+}
+.perf__banks thead th {
+  border-bottom-color: var(--rule);
+}
+.perf__bank {
+  display: inline-block;
+  min-width: 18px;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: var(--bank);
+  color: var(--bank-ink);
+  text-align: center;
+}
+

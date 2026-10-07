@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Tooltip } from 'radix-ui';
 import { BankPanel } from './components/BankPanel';
 import { BankStrip } from './components/BankStrip';
+import { PerfPanel } from './components/PerfPanel';
 import { FxFilters } from './components/FxFilters';
 import { MasterSection } from './components/MasterSection';
 import { PowerSwitch } from './components/PowerSwitch';
@@ -349,6 +350,7 @@ export default function App() {
                   onCopyToAll={copyFxToAll}
                 />
               }
+              perf={<PerfPanel engine={engine} />}
             />
           </div>
           <hr className="divider" />

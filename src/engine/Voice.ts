@@ -1,6 +1,7 @@
 import { CanvasSink, type WrappedCanvas } from 'mediabunny';
 import type { Clip } from './Clip';
 import { envelopeBreakpoints, MIN_RELEASE, valueAt, type Breakpoints, type Envelope } from './envelope';
+import type { BankPerf } from './perf';
 
 /**
  * One triggered playback of a clip between trimStart and trimEnd, starting at AudioContext time `when`.
@@ -21,6 +22,9 @@ export class Voice {
   private readonly envGain: GainNode | null = null;
   private readonly release: number;
   private points: Breakpoints;
+  private readonly stats: BankPerf;
+  private readonly createdAt = performance.now();
+  private gotFirst = false;
   private readonly iter: AsyncGenerator<WrappedCanvas, void, unknown>;
   private current: WrappedCanvas | null = null;
   private next: WrappedCanvas | null = null;
@@ -36,7 +40,9 @@ export class Voice {
     trimStart: number,
     trimEnd: number,
     env: Envelope,
+    stats: BankPerf,
   ) {
+    this.stats = stats;
     this.clip = clip;
     this.actx = actx;
     this.trimStart = trimStart;
@@ -81,8 +87,14 @@ export class Voice {
           this.done = true;
           return;
         }
+        this.stats.decoded++;
+        if (!this.gotFirst) {
+          this.gotFirst = true;
+          this.stats.startup.add(performance.now() - this.createdAt);
+        }
         // Decoder is behind the clock (or this is the first frame): take it and keep pulling.
         if (!this.current || r.value.timestamp <= this.mediaTime()) {
+          if (this.current) this.stats.shown++;
           this.current = r.value;
           this.pull();
         } else {
@@ -102,12 +114,26 @@ export class Voice {
 
   /** The frame to display right now, or null if none is decoded yet. */
   frame(): CanvasImageSource | null {
-    if (this.next && this.next.timestamp <= this.mediaTime()) {
+    const t = this.mediaTime();
+    if (this.next && this.next.timestamp <= t) {
       this.current = this.next;
       this.next = null;
+      this.stats.shown++;
       this.pull();
     }
-    return this.current?.canvas ?? null;
+    const cur = this.current;
+    if (!cur) {
+      this.stats.stalls++;
+      return null;
+    }
+    const lag = (t - (cur.timestamp + cur.duration)) * 1000;
+    if (lag > this.stats.lag) this.stats.lag = lag;
+    return cur.canvas;
+  }
+
+  /** Whether this voice still holds a live video decoder. */
+  get decoderOpen() {
+    return !this.done && !this.disposed;
   }
 
   /** Choke: video cuts at `at`; audio releases from its current level over the release time. */

@@ -57,3 +57,28 @@ input {
   font: inherit;
   color: inherit;
 }
+
+/* Minimal scrollbars: transparent track, small grey thumb */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #14141459 transparent;
+}
+*:hover {
+  scrollbar-color: #141414a6 transparent;
+}
+/* Safari (no scrollbar-width / scrollbar-color support) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: #14141459;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #141414a6;
+}

@@ -1,4 +1,5 @@
 import type { Bank } from './Bank';
+import type { EnginePerf } from './perf';
 
 export const STEPS = 16;
 const LOOKAHEAD = 0.12;
@@ -18,16 +19,18 @@ export class Sequencer {
   private readonly actx: AudioContext;
   private readonly banks: Bank[];
   private readonly getState: () => SequencerState;
+  private readonly perf: EnginePerf | null;
   private timer = 0;
   private nextTime = 0;
   private nextStep = 0;
   private queue: { step: number; time: number }[] = [];
   private shownStep = -1;
 
-  constructor(actx: AudioContext, banks: Bank[], getState: () => SequencerState) {
+  constructor(actx: AudioContext, banks: Bank[], getState: () => SequencerState, perf: EnginePerf | null = null) {
     this.actx = actx;
     this.banks = banks;
     this.getState = getState;
+    this.perf = perf;
   }
 
   start() {
@@ -50,8 +53,12 @@ export class Sequencer {
 
   private tick() {
     const { grid, bpm, muted } = this.getState();
+    this.perf?.tick(performance.now());
     const horizon = this.actx.currentTime + LOOKAHEAD;
     while (this.nextTime < horizon) {
+      const headroom = (this.nextTime - this.actx.currentTime) * 1000;
+      this.perf?.headroom.add(headroom);
+      if (headroom < 0 && this.perf) this.perf.lateTriggers++;
       for (let b = 0; b < this.banks.length; b++) {
         if (grid[b]?.[this.nextStep] && !muted[b]) this.banks[b].trigger(this.nextTime);
       }

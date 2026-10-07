@@ -1,6 +1,7 @@
 import type { Clip } from './Clip';
 import { DEFAULT_ENVELOPE, type Envelope } from './envelope';
 import { DEFAULT_CRUSH, defaultFx, type CrushFx, type DuotoneFx } from './fx';
+import { BankPerf } from './perf';
 import { Voice } from './Voice';
 
 const MAX_VOICES = 4;
@@ -25,7 +26,10 @@ export class Bank {
   private voices: Voice[] = [];
   private lastFrame: CanvasImageSource | null = null;
 
-  constructor(index: number, actx: AudioContext, out: AudioNode) {
+  readonly stats: BankPerf;
+
+  constructor(index: number, actx: AudioContext, out: AudioNode, stats: BankPerf) {
+    this.stats = stats;
     this.index = index;
     this.actx = actx;
     this.gain = actx.createGain();
@@ -60,7 +64,8 @@ export class Bank {
       const sounding = this.voices.filter((v) => v.stopAt > when);
       for (let i = 0; i <= sounding.length - MAX_VOICES; i++) sounding[i].stop(when);
     }
-    this.voices.push(new Voice(clip, this.actx, this.gain, when, this.trimStart, this.trimEnd, this.envelope));
+    this.stats.triggers++;
+    this.voices.push(new Voice(clip, this.actx, this.gain, when, this.trimStart, this.trimEnd, this.envelope, this.stats));
   }
 
   /** Newest voice sounding at `now`. */
@@ -90,6 +95,18 @@ export class Bank {
       v.dispose();
       return false;
     });
+  }
+
+  get voiceCount() {
+    return this.voices.length;
+  }
+
+  soundingCount(now: number) {
+    return this.voices.filter((v) => v.when <= now && now < v.audioEnd).length;
+  }
+
+  get decodersOpen() {
+    return this.voices.filter((v) => v.decoderOpen).length;
   }
 
   stopAll() {

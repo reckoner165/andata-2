@@ -1,7 +1,8 @@
 import { Bank } from './Bank';
 import { downloadBlob, startCapture, type Capture } from './capture';
 import { Clip } from './Clip';
-import { drawWithFx } from './fx';
+import { anyFxActive, crushActive, drawWithFx } from './fx';
+import { EnginePerf, type BankWindow, type GlobalWindow } from './perf';
 import { tileRects } from './layout';
 import { Sequencer, STEPS } from './Sequencer';
 
@@ -12,6 +13,30 @@ export const STAGE_SIZE: Record<Orientation, [w: number, h: number]> = {
   landscape: [1280, 720],
   portrait: [720, 1280],
 };
+
+export interface PerfSnapshot {
+  /** last one-second window; null until the first window has elapsed */
+  window: { global: GlobalWindow; banks: BankWindow[] } | null;
+  powered: boolean;
+  playing: boolean;
+  bouncing: boolean;
+  stage: { width: number; height: number; tiles: number };
+  audio: { state: string; sampleRate: number; baseLatencyMs: number; outputLatencyMs: number } | null;
+  memory: { jsHeapMB: number | null; clipFilesMB: number; clipAudioMB: number; framePoolMB: number };
+  totals: { voices: number; sounding: number; decoders: number };
+  banks: {
+    clip: { duration: number; coded: string; decodeWidth: number; fileMB: number; audioMB: number } | null;
+    muted: boolean;
+    effects: string[];
+    voices: number;
+    sounding: number;
+    decoders: number;
+  }[];
+}
+
+/** Each voice's CanvasSink keeps a small pool of decoded canvases. */
+const FRAME_POOL = 4;
+const MB = 1024 * 1024;
 
 export const emptyGrid = () => Array.from({ length: BANK_COUNT }, () => Array<boolean>(STEPS).fill(false));
 
@@ -39,6 +64,8 @@ export class Engine {
   private bounce: { capture: Capture; stream: MediaStream } | null = null;
   /** Per-bank scratch canvases for pixelation. */
   private scratch: HTMLCanvasElement[] = [];
+  private tiles = 0;
+  readonly perf = new EnginePerf(BANK_COUNT);
 
   attachCanvas(canvas: HTMLCanvasElement | null) {
     this.canvas = canvas;
@@ -63,11 +90,12 @@ export class Engine {
         return a;
       });
       this.master = master;
-      this.banks = Array.from({ length: BANK_COUNT }, (_, i) => new Bank(i, ctx, master));
-      this.seq = new Sequencer(ctx, this.banks, () => this);
+      this.banks = Array.from({ length: BANK_COUNT }, (_, i) => new Bank(i, ctx, master, this.perf.banks[i]));
+      this.seq = new Sequencer(ctx, this.banks, () => this, this.perf);
       this.ctx = ctx;
     }
     await this.ctx.resume();
+    this.perf.reset();
     cancelAnimationFrame(this.raf);
     this.raf = requestAnimationFrame(this.loop);
   }
@@ -217,6 +245,8 @@ export class Engine {
     const c = this.canvas;
     const g = c?.getContext('2d');
     if (!ctx || !c || !g) return;
+    const t0 = performance.now();
+    this.perf.frameStart(t0);
     // Read the size every frame: the orientation toggle resizes the canvas.
     const W = c.width;
     const H = c.height;
@@ -232,13 +262,77 @@ export class Engine {
       const img = b.frame(now);
       if (!img) return;
       const scratch = (this.scratch[b.index] ??= document.createElement('canvas'));
+      const d0 = performance.now();
       drawWithFx(g, img, rects[i], b.index, b.fx, b.crush, scratch);
+      b.stats.draw.add(performance.now() - d0);
     });
+    this.tiles = active.length;
 
     const step = this.seq?.currentStep(now) ?? -1;
     if (step !== this.lastStep) {
       this.lastStep = step;
       this.onStep(step);
     }
+
+    const t1 = performance.now();
+    this.perf.frameWork.add(t1 - t0);
+    this.perf.roll(t1);
   };
+
+  /** Live performance figures for the perf tab: last 1s window plus current state. */
+  perfSnapshot(): PerfSnapshot {
+    const ctx = this.ctx;
+    const now = ctx?.currentTime ?? 0;
+    const banks = this.banks.map((b, i) => {
+      const clip = b.clip;
+      const effects = [b.fx.amount > 0 ? 'two-tone' : '', crushActive(b.crush) ? 'crush' : ''].filter(Boolean);
+      return {
+        clip: clip && {
+          duration: clip.duration,
+          coded: `${clip.videoTrack.codedWidth}×${clip.videoTrack.codedHeight}`,
+          decodeWidth: clip.renderWidth,
+          fileMB: clip.fileBytes / MB,
+          audioMB: clip.audio ? (clip.audio.length * clip.audio.numberOfChannels * 4) / MB : 0,
+        },
+        muted: this.muted[i],
+        effects: anyFxActive(b.fx, b.crush) ? effects : [],
+        voices: b.voiceCount,
+        sounding: b.soundingCount(now),
+        decoders: b.decodersOpen,
+      };
+    });
+    // decoded-frame pools held by open decoders
+    const framePoolMB = this.banks.reduce((sum, b) => {
+      const clip = b.clip;
+      if (!clip) return sum;
+      const h = clip.renderWidth * (clip.videoTrack.displayHeight / clip.videoTrack.displayWidth);
+      return sum + (b.decodersOpen * FRAME_POOL * clip.renderWidth * h * 4) / MB;
+    }, 0);
+    const heap = (performance as unknown as { memory?: { usedJSHeapSize: number } }).memory;
+    return {
+      window: this.perf.last,
+      powered: this.raf !== 0,
+      playing: this.seq?.playing ?? false,
+      bouncing: this.bounce !== null,
+      stage: { width: this.canvas?.width ?? 0, height: this.canvas?.height ?? 0, tiles: this.tiles },
+      audio: ctx && {
+        state: ctx.state,
+        sampleRate: ctx.sampleRate,
+        baseLatencyMs: (ctx.baseLatency ?? 0) * 1000,
+        outputLatencyMs: (ctx.outputLatency ?? 0) * 1000,
+      },
+      memory: {
+        jsHeapMB: heap ? heap.usedJSHeapSize / MB : null,
+        clipFilesMB: banks.reduce((s, b) => s + (b.clip?.fileMB ?? 0), 0),
+        clipAudioMB: banks.reduce((s, b) => s + (b.clip?.audioMB ?? 0), 0),
+        framePoolMB,
+      },
+      totals: {
+        voices: banks.reduce((s, b) => s + b.voices, 0),
+        sounding: banks.reduce((s, b) => s + b.sounding, 0),
+        decoders: banks.reduce((s, b) => s + b.decoders, 0),
+      },
+      banks,
+    };
+  }
 }
