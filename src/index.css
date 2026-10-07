@@ -10,11 +10,16 @@
 }
 
 :root {
-  --bg: #e2e2dd;
-  --panel: #f3f3ef;
-  --surface: #fbfbf8;
-  --line: #cdcdc6;
-  --line-strong: #a9a9a2;
+  /* two quiet levels (page, group panel); hairlines for structure, ink for state */
+  --bg: #ebeae5;
+  --panel: #f3f2ee;
+  --surface: #f9f8f5;
+  --tint: #14141408;
+  --rule: #c2c1b8;
+  --line: #d8d7cf;
+  --line-strong: #a3a39b;
+  /* controls sit slightly proud: darker bottom edge */
+  --key-edge: #a8a8a0;
   --ink: #141414;
   --muted: #85857e;
   --accent: #ff5a1f;

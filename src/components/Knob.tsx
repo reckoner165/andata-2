@@ -113,7 +113,6 @@ export function Knob({
           {Math.abs(angle - origin) > 0.5 && (
             <path d={arc(c, c, ringR, Math.min(origin, angle), Math.max(origin, angle))} className="knob__value" />
           )}
-          <circle cx={c} cy={c + 1} r={capR} className="knob__shadow" />
           <circle cx={c} cy={c} r={capR} fill={disabled ? undefined : color} className="knob__cap" />
           <line x1={x0} y1={y0} x2={x1} y2={y1} className="knob__notch" />
         </svg>
