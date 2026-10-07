@@ -792,6 +792,17 @@
   flex-direction: column;
   gap: 10px;
 }
+/* transport icons are bare until hovered (or keyboard-focused); on-states keep their fill */
+.seq__transport .btn--icon:not(.btn--active):not(.btn--rec-on) {
+  border-color: transparent;
+  background: transparent;
+}
+.seq__transport .btn--icon:not(.btn--active):not(.btn--rec-on):hover:not(:disabled),
+.seq__transport .btn--icon:not(.btn--active):not(.btn--rec-on):focus-visible {
+  border-color: var(--rule);
+  border-bottom-color: var(--key-edge);
+  background: var(--surface);
+}
 .seq__transport {
   display: flex;
   align-items: center;
@@ -808,6 +819,10 @@
   height: 32px;
   /* sits directly on the transport row, no box of its own */
   padding: 0 6px;
+}
+.master .field__label {
+  font-family: var(--label-font);
+  font-size: 11px;
 }
 .master__meter {
   display: grid;
@@ -828,9 +843,11 @@
   grid-column: 1;
 }
 .master__readout {
-  min-width: 52px;
+  /* fixed width so the meter and slider don't shift as the value changes;
+     left-aligned so it sits right after the slider */
+  min-width: 46px;
   font-size: 11px;
-  text-align: right;
+  text-align: left;
 }
 .master .slider {
   width: 90px;
@@ -847,11 +864,11 @@
   color: #fff;
 }
 .lcd__num {
-  width: 44px;
+  width: 38px;
   background: transparent;
   border: none;
   outline: none;
-  font-size: 20px;
+  font-size: 17px;
   line-height: 32px;
   font-variant-numeric: tabular-nums;
   color: #fff;
@@ -976,7 +993,7 @@
 
 /* BPM slider lives inside the black display */
 .slider--lcd {
-  width: 90px;
+  width: 72px;
 }
 .slider--lcd::-webkit-slider-runnable-track {
   background: #ffffff55;
