@@ -1,0 +1,32 @@
+# andata-2
+
+> andata-2 is a 4-track video live looper that runs in the browser: a video groovebox and sampler for live audiovisual performance. Record four webcam + microphone clips into banks, shape them, sequence them with a 16-step sequencer, perform them as a split-screen composition, and export the result as MP4. Free and open source; nothing is uploaded.
+
+## What it is for
+
+- Live audiovisual performance and VJ-style sets built from your own camera footage
+- Making beat-synced split-screen music videos without a video editor
+- Sketching loop-based music where every sound is also a picture
+
+## Workflow
+
+1. Record: pick a camera and mic, choose bank 1–4, record a clip (video + audio, encoded to MP4 in the browser via WebCodecs and mediabunny).
+2. Shape: per bank — trim start/end, gain, pan, ADSR amplitude envelope, choke (retrigger cuts vs. overlaps), and video effects (two-tone gradient map, crush: pixelate X/Y and colour bit depth).
+3. Sequence: 16-step grid at a set BPM; per-row mute; randomize and clear.
+4. Perform: playing banks are composited live — 1 full frame, 2 side by side (stacked in vertical), 3 as two over one, 4 as a 2×2 grid — in 16:9 or 9:16. Audio is mixed through a master bus with a stereo meter.
+5. Bounce: record the composed stage (picture + sound) and download it as MP4.
+
+## Requirements
+
+- A Chromium-based browser (Chrome, Edge, Arc) with WebCodecs and Web Audio
+- Camera and microphone permission; served over HTTPS or localhost
+- Headphones recommended while recording
+
+## Links
+
+- [App]({{SITE_URL}}): the instrument itself
+- [Source code and README](https://github.com/reckoner165/andata-2): setup, architecture, and development notes
+
+## Keywords
+
+video looper, live looper, video sampler, groovebox, step sequencer, sampler, music production, live performance, audiovisual, VJ, live visuals, beat making, loop station, webcam instrument, browser instrument, Web Audio, WebCodecs

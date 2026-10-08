@@ -2,12 +2,112 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- primary -->
     <title>andata-2</title>
+    <meta
+      name="description"
+      content="4-track video looper &amp; sequencer. Record four webcam clips and perform them live in your browser, with split-screen visuals, video effects and MP4 export."
+    />
+    <meta
+      name="keywords"
+      content="video looper, live looper, video sampler, groovebox, groove box, sequencer, step sequencer, music production, live performance, sampler, audiovisual, VJ, VJing, live visuals, video synth, beat making, loop station, drum machine, webcam instrument, browser instrument, web audio, WebCodecs, video effects, split screen video, ADSR, music video, creative coding"
+    />
+    <meta name="author" content="andata-2" />
+    <meta name="application-name" content="andata-2" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="%VITE_SITE_URL%" />
+    <meta name="theme-color" content="#e5e4df" />
+    <meta name="color-scheme" content="light" />
+
+    <!-- icons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Open Graph (Facebook, LinkedIn, Slack, Discord, iMessage) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="andata-2" />
+    <meta property="og:title" content="andata-2" />
+    <meta
+      property="og:description"
+      content="4-track video looper &amp; sequencer. Record four webcam clips, sequence them and perform them live in your browser, then export to MP4."
+    />
+    <meta property="og:url" content="%VITE_SITE_URL%" />
+    <meta property="og:image" content="%VITE_SITE_URL%og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="andata-2 logo: four vertical bars in lemon, light green-yellow, violet blue and violet black" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="andata-2" />
+    <meta
+      name="twitter:description"
+      content="4-track video looper &amp; sequencer. Record four webcam clips, sequence them, perform live, export MP4."
+    />
+    <meta name="twitter:image" content="%VITE_SITE_URL%og-image.png" />
+    <meta name="twitter:image:alt" content="andata-2 logo: four vertical colour bars" />
+
+    <!-- structured data for search engines and LLM-based search -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "andata-2",
+        "alternateName": "andata 2",
+        "description": "4-track video looper & sequencer that runs in the browser. Record four webcam and microphone clips into banks, shape each one (trim, gain, pan, ADSR envelope, choke, two-tone and crush video effects), sequence them with a 16-step sequencer, perform them as a live split-screen audiovisual composition, and bounce the result to MP4.",
+        "url": "%VITE_SITE_URL%",
+        "image": "%VITE_SITE_URL%og-image.png",
+        "applicationCategory": "MultimediaApplication",
+        "applicationSubCategory": "Music production, video performance",
+        "operatingSystem": "Any (Chromium-based browser with WebCodecs)",
+        "browserRequirements": "Requires a Chromium-based browser (Chrome, Edge), WebCodecs, Web Audio, and camera/microphone access.",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "codeRepository": "https://github.com/reckoner165/andata-2",
+        "keywords": "video looper, groovebox, sequencer, sampler, live performance, music production, VJ, audiovisual",
+        "featureList": [
+          "Record video and audio clips from a webcam and microphone into 4 banks",
+          "16-step sequencer with BPM, per-row mute, randomize and clear",
+          "Per-bank trim, gain, pan, ADSR envelope and choke",
+          "Per-bank video effects: two-tone and crush (pixelate, bit depth)",
+          "Live split-screen compositing in horizontal (16:9) or vertical (9:16)",
+          "Master volume with stereo meter",
+          "Record the composed output and download it as MP4",
+          "Runs entirely in the browser; nothing is uploaded"
+        ]
+      }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Static summary for crawlers and LLM tools that don't run JavaScript.
+           React replaces it as soon as the app mounts. -->
+      <main style="max-width: 640px; margin: 64px auto; padding: 0 16px; font-family: system-ui, sans-serif; color: #141414">
+        <h1>andata-2</h1>
+        <p><strong>4-track video looper &amp; sequencer</strong></p>
+        <p>
+          andata-2 is a browser instrument for performing with short video loops: a video groovebox and sampler. Record four
+          clips from your camera and microphone, shape each one, then sequence them into a live audiovisual composition.
+        </p>
+        <h2>What it does</h2>
+        <ol>
+          <li><strong>Record</strong> video and audio clips into four banks, encoded to MP4 in the browser.</li>
+          <li><strong>Shape</strong> each bank: trim, gain, pan, ADSR envelope, choke, and video effects (two-tone, crush).</li>
+          <li><strong>Sequence</strong> the banks with a 16-step sequencer, with tempo, mutes, randomize and clear.</li>
+          <li><strong>Perform</strong> them live: playing banks are composited split-screen, horizontal or vertical.</li>
+          <li><strong>Bounce</strong> the composed picture and sound to a downloadable MP4.</li>
+        </ol>
+        <p>Runs entirely in the browser (Chromium-based, WebCodecs + Web Audio). Nothing is uploaded.</p>
+        <p><a href="https://github.com/reckoner165/andata-2">Source code on GitHub</a></p>
+        <noscript><p><strong>andata-2 needs JavaScript enabled to run.</strong></p></noscript>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
